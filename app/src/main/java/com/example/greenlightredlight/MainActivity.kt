@@ -5,12 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.greenlightredlight.ui.theme.GreenLightRedLightTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,29 +19,34 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             GreenLightRedLightTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                Surface(modifier = Modifier.fillMaxSize()){
+                    val navController = rememberNavController()
+                    val viewModel: BudgetViewModel = viewModel()
+
+                    NavHost(
+                        navController = navController,
+                        startDestination = NavRoutes.HOME
+                    ){
+                        composable(NavRoutes.HOME){
+                            HomeScreen(navController = navController, viewModel = viewModel)
+                        }
+                        composable(NavRoutes.ADD_ENTRY){
+                            AddEntryScreen(navController = navController, viewModel = viewModel)
+                        }
+                        composable(NavRoutes.DELETE_ENTRY){
+                            DeleteEntryScreen(navController = navController, viewModel = viewModel)
+                        }
+                        composable(NavRoutes.TAX_BREAKDOWN){
+                            backStackEntry->
+                            val entryId = backStackEntry.arguments?.getString("entryId")?.toIntOrNull() ?:0
+                            PlaceholderScreen(navController = navController, title = "Tax Breakdown - Coming Soon")
+                        }
+                        composable(NavRoutes.ALL_TAX_BREAKDOWN){
+                            PlaceholderScreen(navController = navController, title = "All Tax Breakdown - Coming Soon")
+                        }
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    GreenLightRedLightTheme {
-        Greeting("Android")
     }
 }
