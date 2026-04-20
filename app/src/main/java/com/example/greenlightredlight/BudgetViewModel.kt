@@ -19,11 +19,11 @@ class BudgetViewModel : ViewModel() {
     }
 
     fun totalIncome(): Double {
-        return _entries.value.filter { it.isIncome }.sumOf { it.amount }
+        return _entries.value.filter { it.isIncome }.sumOf{ it.weeklyAmount }
     }
 
     fun totalExpenses(): Double {
-        return _entries.value.filter { !it.isIncome }.sumOf { it.amount }
+        return _entries.value.filter { !it.isIncome }.sumOf{ it.weeklyAmount }
     }
 
     fun netBalance():Double {

@@ -1,13 +1,17 @@
 package com.example.greenlightredlight
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -113,14 +117,30 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                         Text("◀ Red Light", color = Red, fontSize = 10.sp)
                         Text("Green Light ▶", color = Teal, fontSize = 10.sp)
                     }
-                    LinearProgressIndicator(
-                        progress = { progress },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(10.dp),
-                        color = if (isGreenLight) Teal else Red,
-                        trackColor = DarkCard
-                    )
+                    Box(
+                        modifier = Modifier.fillMaxWidth().height(10.dp)
+                    ){
+                        Row(modifier=Modifier.fillMaxSize()){
+                            Box(
+                                modifier = Modifier.weight(1f).fillMaxHeight().background(
+                                        brush = Brush.horizontalGradient(colors = listOf(Red, DarkCard))
+                                )
+                            )
+                            Box(
+                                modifier = Modifier.weight(1f).fillMaxHeight().background(
+                                    brush = Brush.horizontalGradient(colors = listOf(DarkCard, Teal))
+                                )
+                            )
+                        }
+                        Box(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .width(4.dp)
+                                .align(Alignment.CenterStart)
+                                .offset(x = (progress*1f*360).dp - 2.dp)
+                                .background(Color.White, shape= RoundedCornerShape(2.dp))
+                        )
+                    }
                 }
             }
             item {
@@ -167,11 +187,15 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    "${entry.name} — ${if (entry.isRecurring) "Recurring" else "Incidental"}",
+                                    "${entry.name} — ${if (entry.isRecurring) "Recurring" else "Incidental"} — ${entry.frequency}",
                                     color = Color.White,
                                     fontSize = 11.sp
                                 )
-                                Text("$%.2f".format(entry.amount), color = Teal, fontSize = 11.sp, fontWeight = FontWeight.Medium)
+                                Text("$%.2f/wk".format(entry.weeklyAmount),
+                                    color = Teal,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
                             }
                             Spacer(modifier = Modifier.height(4.dp))
                             OutlinedButton(
@@ -221,11 +245,15 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                "${entry.name} — ${if (entry.isRecurring) "Recurring" else "Incidental"}",
+                                "${entry.name} — ${if (entry.isRecurring) "Recurring" else "Incidental"} — ${entry.frequency}",
                                 color = Color.White,
                                 fontSize = 11.sp
                             )
-                            Text("$%.2f".format(entry.amount), color = Red, fontSize = 11.sp, fontWeight = FontWeight.Medium)
+                            Text("$%.2f/wk".format(entry.weeklyAmount),
+                                color = Red,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Medium
+                            )
                         }
                     }
                 }
