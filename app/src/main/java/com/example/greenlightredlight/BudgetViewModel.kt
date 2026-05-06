@@ -1,29 +1,40 @@
 package com.example.greenlightredlight
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
-class BudgetViewModel : ViewModel() {
-    private val _entries = MutableStateFlow<List<Entry>>(emptyList())
-    val entries: StateFlow<List<Entry>> = _entries
+class BudgetViewModel(private val entryDao: EntryDao) : ViewModel() {
 
-    private var nextId = 1
+    val entries: StateFlow<List<Entry>> = entryDao.getAllEntries().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
 
     fun addEntry(entry: Entry) {
-        _entries.value = _entries.value+ entry.copy(id = nextId++)
+        viewModelScope.launch {
+            entryDao.insertEntry(entry)
+        }
     }
 
     fun deleteEntry(entryId: Int){
-        _entries.value = _entries.value.filter{it.id != entryId}
+        viewModelScope.launch {
+            val entry = entries.value.find{it.id == entryId}
+            entry?.let {entryDao.deleteEntry(it)}
+        }
     }
 
     fun totalIncome(): Double {
-        return _entries.value.filter { it.isIncome }.sumOf{ it.weeklyAmount }
+        return entries.value.filter{it.isIncome}.sumOf{it.weeklyAmount}
     }
 
     fun totalExpenses(): Double {
-        return _entries.value.filter { !it.isIncome }.sumOf{ it.weeklyAmount }
+        return entries.value.filter{!it.isIncome}.sumOf{it.weeklyAmount}
     }
 
     fun netBalance():Double {
@@ -31,6 +42,6 @@ class BudgetViewModel : ViewModel() {
     }
 
     fun getEntryById(id: Int): Entry?{
-        return _entries.value.find{it.id == id}
+        return entries.value.find{it.id == id}
     }
 }

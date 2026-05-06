@@ -3,7 +3,6 @@ package com.example.greenlightredlight
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
@@ -16,12 +15,14 @@ import com.example.greenlightredlight.ui.theme.GreenLightRedLightTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             GreenLightRedLightTheme {
                 Surface(modifier = Modifier.fillMaxSize()){
                     val navController = rememberNavController()
-                    val viewModel: BudgetViewModel = viewModel()
+                    val database = AppDatabase.getInstance(applicationContext)
+                    val factory = ViewModelFactory(database.entryDao())
+                    val viewModel: BudgetViewModel = viewModel(factory = factory)
+
 
                     NavHost(
                         navController = navController,
