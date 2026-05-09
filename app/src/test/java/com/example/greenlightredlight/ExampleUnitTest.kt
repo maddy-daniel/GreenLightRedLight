@@ -1,4 +1,4 @@
-package com.example.greenlightredlight
+package com.mads.greenlightredlight
 
 import org.junit.Test
 

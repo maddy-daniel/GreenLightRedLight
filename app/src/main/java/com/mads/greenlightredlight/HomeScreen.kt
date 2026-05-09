@@ -1,4 +1,4 @@
-package com.example.greenlightredlight
+package com.mads.greenlightredlight
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -200,7 +200,7 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                             Spacer(modifier = Modifier.height(4.dp))
                             OutlinedButton(
                                 onClick = {
-                                    navController.navigate("tax_breakdown/${entry.id}")
+                                    navController.navigate("TAX_BREAKDOWN")
                                 },
                                 contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
                                 modifier = Modifier.height(28.dp),

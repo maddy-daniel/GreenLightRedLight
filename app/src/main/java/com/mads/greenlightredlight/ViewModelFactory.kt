@@ -1,4 +1,4 @@
-package com.example.greenlightredlight
+package com.mads.greenlightredlight
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

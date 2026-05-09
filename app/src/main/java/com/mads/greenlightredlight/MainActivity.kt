@@ -1,28 +1,34 @@
-package com.example.greenlightredlight
+package com.mads.greenlightredlight
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.greenlightredlight.ui.theme.GreenLightRedLightTheme
+import androidx.compose.foundation.layout.systemBars
+import com.mads.greenlightredlight.ui.GreenLightRedLightTheme
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
             GreenLightRedLightTheme {
-                Surface(modifier = Modifier.fillMaxSize()){
+                Surface(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars),
+                    ){
                     val navController = rememberNavController()
                     val database = AppDatabase.getInstance(applicationContext)
                     val factory = ViewModelFactory(database.entryDao())
                     val viewModel: BudgetViewModel = viewModel(factory = factory)
-
 
                     NavHost(
                         navController = navController,

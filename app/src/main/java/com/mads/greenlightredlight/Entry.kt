@@ -1,4 +1,4 @@
-package com.example.greenlightredlight
+package com.mads.greenlightredlight
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

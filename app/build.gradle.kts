@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.greenlightredlight"
+    namespace = "com.mads.greenlightredlight"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.greenlightredlight"
+        applicationId = "com.mads.greenlightredlight"
         minSdk = 24
         targetSdk = 36
         versionCode = 1

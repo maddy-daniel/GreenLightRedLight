@@ -1,4 +1,4 @@
-package com.example.greenlightredlight.ui.theme
+package com.mads.greenlightredlight.ui
 
 import androidx.compose.ui.graphics.Color
 

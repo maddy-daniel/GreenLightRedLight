@@ -8,9 +8,12 @@
             android:fullBackupContent="@xml/backup_rules"
             android:label="@string/app_name"
             android:supportsRtl="true"
-            android:theme="@style/Theme.GreenLightRedLight">
+            android:theme="@style/Theme.GreenLightRedLight"
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon = "@mipmap/ic_launcher">
+
         <activity
-                android:name=".MainActivity"
+                android:name="com.mads.greenlightredlight.MainActivity"
                 android:exported="true"
                 android:label="@string/app_name"
                 android:theme="@style/Theme.GreenLightRedLight">
