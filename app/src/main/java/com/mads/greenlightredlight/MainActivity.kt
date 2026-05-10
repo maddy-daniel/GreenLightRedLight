@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             GreenLightRedLightTheme {
-                Surface(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars),
+                Surface(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars),     //Should now show navigation bar and top bar of phone
                     ){
                     val navController = rememberNavController()
                     val database = AppDatabase.getInstance(applicationContext)
