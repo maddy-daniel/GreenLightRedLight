@@ -89,9 +89,9 @@ fun HelpScreen(navController: NavController) {
                 )
                 Spacer(modifier = Modifier.height(4.dp))
 
-                HelpStep(label = "Federal Income Tax", description = "Based on your 2026 federal income tax bracket.")
-                HelpStep(label = "Social Security", description = "6.2% of your gross income.")
-                HelpStep(label = "Medicare", description = "1.45% of your gross income.")
+                HelpStep(label = "Federal Income Tax:", description = "Based on your 2026 federal income tax bracket.")
+                HelpStep(label = "Social Security:", description = "6.2% of your gross income.")
+                HelpStep(label = "Medicare:", description = "1.45% of your gross income.")
             }
 
             HorizontalDivider(color = Color(0xFF2A2A4A))
