@@ -32,8 +32,15 @@ class MainActivity : ComponentActivity() {
 
                     NavHost(
                         navController = navController,
-                        startDestination = NavRoutes.HOME
+                        startDestination = NavRoutes.WELCOME
                     ){
+                        composable(NavRoutes.WELCOME){
+                            WelcomeScreen(navController = navController)
+                        }
+                        composable(NavRoutes.HELP){
+                            HelpScreen(navController = navController)
+                        }
+
                         composable(NavRoutes.HOME){
                             HomeScreen(navController = navController, viewModel = viewModel)
                         }
