@@ -200,7 +200,7 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                             Spacer(modifier = Modifier.height(4.dp))
                             OutlinedButton(
                                 onClick = {
-                                    navController.navigate("TAX_BREAKDOWN")
+                                    navController.navigate("tax_breakdown/${entry.id}")
                                 },
                                 contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
                                 modifier = Modifier.height(28.dp),
