@@ -202,7 +202,7 @@ Known Issues & Future Work:
 - Swipe to delete, edit, and duplicate an entry: Planned
 - Delete confirmation dialogue: Planned
 - Empty state messages: Planned
-- Haptic feedback
+- Haptic feedback (vibration feedback)
 - Bottom navigation bar: Planned
 - Weekly history screen: Planned
 - Calendar screen: Planned
