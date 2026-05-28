@@ -17,7 +17,7 @@ import androidx.navigation.NavController
 @Composable
 fun AllTaxBreakdownScreen(navController: NavController, viewModel:BudgetViewModel) {
     val entries by viewModel.entries.collectAsState()
-    val incomeEntries = entries.filter{it.isIncome}
+    val incomeEntries = entries.filter{it.isIncome && it.isHourly}
     val context = LocalContext.current
 
     val totalNetTakeHome = incomeEntries.sumOf{

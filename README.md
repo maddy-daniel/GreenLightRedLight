@@ -16,6 +16,9 @@ Framework: Jetpack Compose
 
 Features:
 Current Features:
+- Welcome screen with Start button and Help button displayed on every fresh app launch
+- Help screen explaining the apps features, category types, income types, pay frequencies and federal tax breakdown
+- 
 - Add income entries with name, amount, pay frequency, category, and income type
 - Add expense entries with name, amount, pay frequency, category, and monthly toggle
 - Delete income and expense entries
@@ -25,16 +28,22 @@ Current Features:
 - All amounts automatically converted to weekly equivalents
 - Hourly income calculation from pay rate * hours worked with live preview
 - Monthly expense conversion to weekly amount (divide by 4.2)
+- Yearly expense conversion to weekly amount (divide by 52)
+- Federal tax breakdown per income entry - federal tax income, social security, and medicare
+- All tax breakdowns screen showing all income entries with deductions and total net take-home
+- CSV download for individual and all tax breakdowns saved to device Downloads folder
 - Local data persistence using Room Database, entries survive app close and reopen
 - Custom app icon with navy to dark blue gradient and teal G  / red R letters
 
-Planned Features: 
-- Welcome screen with Start and Help buttons
-- Help screen explaining app features, categories, income types, and pay frequencies
+Planned Features:
 - New Week Rollover which clears incidental entries, keeps recurring entries
-- Federal tax breakdown per income entry (Federal income tax, Social Security, Medicare)
-- All tax breakdowns screen with total net take-home
-- CSV download for individual and all tax breakdowns
+- Swipe to delete, edit, and duplicate entries
+- Delete confirmation log
+- Empty state messages
+- Haptic Feedback
+- Bottom navigation bar with Home, History, and Calendar tabs
+- Weekly History screen
+- Calendar screen
 - Google Play Store release
 
 Tech Stack:
@@ -47,9 +56,6 @@ Tech Stack:
 - Build System - Gradle (KTS)
 - IDE - IntelliJ IDEA
 - Version Control - Git/GitHub
-
-Project Structure:
-
 
 Configuration:
 Requirements - 
@@ -73,7 +79,7 @@ implementation("androidx.compose.ui:ui-tooling-preview")
 implementation("androidx.compose.material3:material3")
 
 //Navigation
-implementatio("androidx.navigation:navigation-compose:2.7.7")
+implementation("androidx.navigation:navigation-compose:2.7.7")
 
 //ViewModel
 implementation("androidx.lifecycle:lifecyle-viewmodel-compose:2.6.1")
@@ -145,7 +151,9 @@ Navigation:
 Navigation is handled by the Jetpack Navigation Component. All routes are defined in NavRoutes.kt:
 
 Route-
+- welcome - Welcome Screen
 - home - Home Screen
+- help - Help Screen
 - add_entry - Add Entry Screen
 - delete_entry - Delete Entry Screen
 - TAX_BREAKDOWN - Tax Breakdown (Placeholder)
@@ -184,18 +192,20 @@ Database Name: greenlightredlight_database
 Version: 1
 Tables Entries
 
-The EntryDao proviedes three operations:
+The EntryDao provides three operations:
 - insertEntry(entry): inserts a new entry
 - deleteEntry(entry): deletes an existing entry
 - getAllEntries(): returns all entries as Flow<List<Entry>> for real-time UI updates
 
 Known Issues & Future Work:
-- Welcome Screen: Planned
-- Help Screen: Planned
 - New Week Rollover: Planned
-- Tax Breakdown Screen: Planned
-- All Tax Breakdowns Screen: Planned
-- CSV Download: Planned
+- Swipe to delete, edit, and duplicate an entry: Planned
+- Delete confirmation dialogue: Planned
+- Empty state messages: Planned
+- Haptic feedback
+- Bottom navigation bar: Planned
+- Weekly history screen: Planned
+- Calendar screen: Planned
 - Unit Tests: Planned
 - Play Store Released: Planned
 - Some UI elements cut off on smaller screens: In progress
