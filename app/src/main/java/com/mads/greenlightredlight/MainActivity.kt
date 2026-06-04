@@ -53,10 +53,10 @@ class MainActivity : ComponentActivity() {
                         composable(NavRoutes.TAX_BREAKDOWN){
                             backStackEntry->
                             val entryId = backStackEntry.arguments?.getString("entryId")?.toIntOrNull() ?:0
-                            PlaceholderScreen(navController = navController, title = "Tax Breakdown - Coming Soon")
+                            TaxBreakdownScreen(navController = navController, viewModel = viewModel, entryId= entryId)
                         }
                         composable(NavRoutes.ALL_TAX_BREAKDOWN){
-                            PlaceholderScreen(navController = navController, title = "All Tax Breakdown - Coming Soon")
+                            AllTaxBreakdownScreen(navController = navController, viewModel = viewModel)
                         }
                     }
                 }

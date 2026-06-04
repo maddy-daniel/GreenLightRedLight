@@ -197,17 +197,19 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                                     fontWeight = FontWeight.Medium
                                 )
                             }
-                            Spacer(modifier = Modifier.height(4.dp))
-                            OutlinedButton(
-                                onClick = {
-                                    navController.navigate("TAX_BREAKDOWN")
-                                },
-                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
-                                modifier = Modifier.height(28.dp),
-                                colors = ButtonDefaults.outlinedButtonColors(contentColor = Teal),
-                                border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(width = 1.dp)
-                            ) {
-                                Text("📄 View tax breakdown", fontSize = 9.sp)
+                            if(entry.isHourly) {
+                                Spacer(modifier = Modifier.height(4.dp))
+                                OutlinedButton(
+                                    onClick = {
+                                        navController.navigate("tax_breakdown/${entry.id}")
+                                    },
+                                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
+                                    modifier = Modifier.height(28.dp),
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Teal),
+                                    border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(width = 1.dp)
+                                ) {
+                                    Text("📄 View tax breakdown", fontSize = 9.sp)
+                                }
                             }
                         }
                     }
@@ -279,13 +281,18 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                     Text("- Delete entry", color = Color.White, fontWeight = FontWeight.Medium)
                 }
                 Spacer(modifier = Modifier.height(6.dp))
-                OutlinedButton(
-                    onClick = { navController.navigate(NavRoutes.ALL_TAX_BREAKDOWN) },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Teal),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text("📊 View all tax breakdowns", fontSize = 13.sp)
+                val hasHourlyIncome = incomeEntries.any{
+                    it.isHourly
+                }
+                if(hasHourlyIncome) {
+                    OutlinedButton(
+                        onClick = { navController.navigate(NavRoutes.ALL_TAX_BREAKDOWN) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Teal),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text("📊 View all tax breakdowns", fontSize = 13.sp)
+                    }
                 }
             }
         }
