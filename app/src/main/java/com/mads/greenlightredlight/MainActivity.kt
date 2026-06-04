@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
                     ){
                     val navController = rememberNavController()
                     val database = AppDatabase.getInstance(applicationContext)
-                    val factory = ViewModelFactory(database.entryDao())
+                    val factory = ViewModelFactory(database.entryDao(), applicationContext)
                     val viewModel: BudgetViewModel = viewModel(factory = factory)
 
                     NavHost(
