@@ -30,7 +30,14 @@ class BudgetViewModel(private val entryDao: EntryDao) : ViewModel() {
     }
 
     fun totalIncome(): Double {
-        return entries.value.filter{it.isIncome}.sumOf{it.weeklyAmount}
+        return entries.value.filter{it.isIncome}.sumOf{
+            if(it.isHourly){
+                TaxCalculator.calculateNetTakeHome(it.weeklyAmount)
+            }
+            else{
+                it.weeklyAmount
+            }
+        }
     }
 
     fun totalExpenses(): Double {
