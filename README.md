@@ -198,7 +198,7 @@ The EntryDao provides three operations:
 - getAllEntries(): returns all entries as Flow<List<Entry>> for real-time UI updates
 
 Known Issues & Future Work:
-- New Week Rollover: Planned
+- New Week Rollover: Planned and is next to be done
 - Swipe to delete, edit, and duplicate an entry: Planned
 - Delete confirmation dialogue: Planned
 - Empty state messages: Planned

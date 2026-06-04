@@ -191,11 +191,30 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                                     color = Color.White,
                                     fontSize = 11.sp
                                 )
-                                Text("$%.2f/wk".format(entry.weeklyAmount),
-                                    color = Teal,
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Medium
-                                )
+                                if(entry.isHourly){
+                                    val netTakeHome = TaxCalculator.calculateNetTakeHome(entry.weeklyAmount)
+                                    Column(horizontalAlignment = Alignment.End){
+                                        Text(
+                                            text = "After Tax",
+                                            color = MutedText,
+                                            fontSize = 9.sp
+                                        )
+                                        Text(
+                                            text = "$${String.format("%.2f", netTakeHome)}/wk",
+                                            color = Teal,
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                }
+                                else{
+                                    Text(
+                                        text = "$%.2f/wk".format(entry.weeklyAmount),
+                                        color = Teal,
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                }
                             }
                             if(entry.isHourly) {
                                 Spacer(modifier = Modifier.height(4.dp))
