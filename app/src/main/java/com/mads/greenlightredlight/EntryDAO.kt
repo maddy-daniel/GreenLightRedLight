@@ -17,4 +17,7 @@ interface EntryDao{
 
     @Query("SELECT * FROM entries")
     fun getAllEntries(): Flow<List<Entry>>
+
+    @Query("DELETE FROM entries WHERE is_recurring = 0")
+    suspend fun deleteIncidentalEntries()
 }
