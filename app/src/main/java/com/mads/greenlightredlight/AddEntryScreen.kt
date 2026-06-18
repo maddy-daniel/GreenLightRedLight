@@ -316,7 +316,8 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel) {
                                     isIncome = isIncome,
                                     isRecurring = isRecurring,
                                     isHourly = isHourly,
-                                    frequency = if(isIncome) frequency else if (isMonthlyExpense)"Monthly" else "Weekly"
+                                    frequency = if(isIncome) frequency else if (isMonthlyExpense)"Monthly" else "Weekly",
+                                    dateAdded = java.time.LocalDate.now().toString()
                                 )
                             )
                             navController.popBackStack()

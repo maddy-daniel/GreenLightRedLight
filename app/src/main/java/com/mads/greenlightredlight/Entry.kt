@@ -3,6 +3,7 @@ package com.mads.greenlightredlight
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.time.LocalDate
 
 @Entity(tableName = "entries")
 
@@ -22,5 +23,7 @@ data class Entry(
     @ColumnInfo(name = "is_hourly")
     val isHourly: Boolean = false,
     @ColumnInfo(name = "frequency")
-    val frequency: String = "Weekly"
+    val frequency: String = "Weekly",
+    @ColumnInfo(name="date_added")
+    val dateAdded: String = LocalDate.now().toString()
 )
