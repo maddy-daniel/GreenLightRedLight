@@ -58,6 +58,9 @@ class MainActivity : ComponentActivity() {
                         composable(NavRoutes.ALL_TAX_BREAKDOWN){
                             AllTaxBreakdownScreen(navController = navController, viewModel = viewModel)
                         }
+                        composable(NavRoutes.CALENDAR){
+                            CalendarScreen(navController = navController, viewModel = viewModel)
+                        }
                     }
                 }
             }

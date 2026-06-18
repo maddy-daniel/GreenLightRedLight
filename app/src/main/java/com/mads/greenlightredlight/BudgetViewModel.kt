@@ -80,4 +80,16 @@ class BudgetViewModel(private val entryDao: EntryDao, private val context: Conte
     fun getEntryById(id: Int): Entry?{
         return entries.value.find{it.id == id}
     }
+
+    fun getEntriesForDate(date: String): List<Entry>{
+        return entries.value.filter{
+            it.dateAdded == date
+        }
+    }
+
+    fun getEntriesForWeek(startDate: String, endDate: String): List<Entry>{
+        return entries.value.filter{
+            it.dateAdded >= startDate && it.dateAdded<= endDate
+        }
+    }
 }

@@ -9,4 +9,6 @@ object NavRoutes {
     const val TAX_BREAKDOWN = "tax_breakdown/{entryId}"
     const val ALL_TAX_BREAKDOWN = "all_tax_breakdown"
 
+    const val CALENDAR = "calendar"
+
 }
