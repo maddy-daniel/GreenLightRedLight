@@ -8,7 +8,7 @@ object NavRoutes {
     const val DELETE_ENTRY = "delete_entry"
     const val TAX_BREAKDOWN = "tax_breakdown/{entryId}"
     const val ALL_TAX_BREAKDOWN = "all_tax_breakdown"
-
     const val CALENDAR = "calendar"
+    const val HISTORY = "history"
 
 }

@@ -18,7 +18,6 @@ Features:
 Current Features:
 - Welcome screen with Start button and Help button displayed on every fresh app launch
 - Help screen explaining the apps features, category types, income types, pay frequencies and federal tax breakdown
-- 
 - Add income entries with name, amount, pay frequency, category, and income type
 - Add expense entries with name, amount, pay frequency, category, and monthly toggle
 - Delete income and expense entries
@@ -34,16 +33,19 @@ Current Features:
 - CSV download for individual and all tax breakdowns saved to device Downloads folder
 - Local data persistence using Room Database, entries survive app close and reopen
 - Custom app icon with navy to dark blue gradient and teal G  / red R letters
+- Status bar and navigation bar insets handled correctly for all Android devices
+- Java 8+ date/time API support via core library desugaring for API 24+ compatibility
+- Automatic New Week Rollover every Sunday - Clears incidental entries, keeps recurring entries
+- Bottom navigation bar with Home, History, and Calendar tabs
+- Calendar screen - view entries by date, tap a date to see daily entries, tap a week number to see weekly summary
+- History screen - placeholder, full implementation coming soon
 
 Planned Features:
-- New Week Rollover which clears incidental entries, keeps recurring entries
+- Weekly History screen
 - Swipe to delete, edit, and duplicate entries
 - Delete confirmation log
 - Empty state messages
 - Haptic Feedback
-- Bottom navigation bar with Home, History, and Calendar tabs
-- Weekly History screen
-- Calendar screen
 - Google Play Store release
 
 Tech Stack:
@@ -103,6 +105,7 @@ android{
     }
 
     compileOptions{
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -135,6 +138,7 @@ data class Entry(
     @ColumnInfo(name = "is_recurring") val isRecurring: Boolean,
     @ColumnInfo(name = "is_hourly") val isHourly: Boolean = false,
     @ColumnInfo(name = "frequency") val frequency: String = "Weekly"
+    @ColumnInfo(name = "date_added") val dateAdded: String = LocalDate.now().toString()
 )
 
 Fields:
@@ -146,6 +150,7 @@ Fields:
 - isRecurring - True for recurring, false for incidental
 - isHourly - True if income is hourly, false if flat
 - Frequency - Pay frequency string (Weekly, Bi-Weekly, etc.)
+- dateAdded - Date the entry was created in yyyy-MM-dd format
 
 Navigation: 
 Navigation is handled by the Jetpack Navigation Component. All routes are defined in NavRoutes.kt:
@@ -156,8 +161,10 @@ Route-
 - help - Help Screen
 - add_entry - Add Entry Screen
 - delete_entry - Delete Entry Screen
-- TAX_BREAKDOWN - Tax Breakdown (Placeholder)
-- ALL_TAX_BREAKDOWN - All Tax Breakdowns (Placeholder)
+- tax_breakdown/{entryId} - Tax Breakdown Screen
+- all_tax_breakdown - All Tax Breakdowns Screen
+- calendar - Calendar Screen
+- history - History Screen
 
 Pay Frequency Conversions: 
 All income entries are converted to a weekly amount using the following formulas:
@@ -168,6 +175,7 @@ Bi-Weekly - 26 paychecks per year; Formula is amount / 2.0
 Semi-Weekly - 24 paychecks per year; Formula is (amount * 24) / 52.0
 Monthly - 12 paychecks per year; Formula is (amount * 12) / 52.0
 Monthly Expense - 12 bills per year; Formula is amount / 4.2
+Yearly Expense - 1; amount/ 52.0
 
 Federal Tax Calculations: 
 Federal tax deductions are calculated per income entry using the following rates:
@@ -189,23 +197,31 @@ The app uses Room Database for local data persistence.
 The database is initialized as a singleton in AppDatabase.kt and provided to the BudgetViewModel via ViewModelFactory.kt.
 
 Database Name: greenlightredlight_database
-Version: 1
-Tables Entries
+Version: 2
+Tables: entries
 
 The EntryDao provides three operations:
 - insertEntry(entry): inserts a new entry
 - deleteEntry(entry): deletes an existing entry
 - getAllEntries(): returns all entries as Flow<List<Entry>> for real-time UI updates
+- deleteIncidentalEntries(): deletes all incidental entries (used by rollover)
+- getEntriesByDate(date): returns entries for a specific date
+- getEntriesByWeek(startDate, endDate): returns entries within a date range
+
+Database Migrations:
+- Version 1 -> 2: Added date_added column to entries table
+
+Automatic Rollover:
+The app automatically checks on every launch whether a new week (Sunday) has started since the last rollover.
+If yes, all incidental entries are deleted and recurring entries are kept.
+The las rollover date is stored in SharedPreferences under the key last_rollover_date
 
 Known Issues & Future Work:
-- New Week Rollover: Planned and is next to be done
+- Weekly history screen - full implementation: Planned
 - Swipe to delete, edit, and duplicate an entry: Planned
 - Delete confirmation dialogue: Planned
 - Empty state messages: Planned
 - Haptic feedback (vibration feedback)
-- Bottom navigation bar: Planned
-- Weekly history screen: Planned
-- Calendar screen: Planned
 - Unit Tests: Planned
 - Play Store Released: Planned
 - Some UI elements cut off on smaller screens: In progress
