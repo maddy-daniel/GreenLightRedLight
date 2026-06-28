@@ -22,6 +22,7 @@ class BudgetViewModel(private val entryDao: EntryDao, private val context: Conte
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
+
     init{
         checkAndPerformRollover()
     }
@@ -91,5 +92,39 @@ class BudgetViewModel(private val entryDao: EntryDao, private val context: Conte
         return entries.value.filter{
             it.dateAdded >= startDate && it.dateAdded<= endDate
         }
+    }
+
+    fun getWeeklyHistory(): List<WeekSummary>{
+        val today = LocalDate.now()
+        val currentWeekStart = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY))
+
+        return entries.value.filter{
+            entry->
+            val entryDate = LocalDate.parse(entry.dateAdded)
+            val entryWeekStart = entryDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY))
+            entryWeekStart.isBefore(currentWeekStart)
+        }.groupBy{
+            entry->
+            val entryDate = LocalDate.parse(entry.dateAdded)
+            entryDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY))
+        }.map{
+            (weekStart,weekEntries)->
+            val weekEnd = weekStart.plusDays(6)
+            val totalIncome = weekEntries.filter{it.isIncome}.sumOf{
+                if(it.isHourly) TaxCalculator.calculateNetTakeHome(it.weeklyAmount)
+                else it.weeklyAmount
+            }
+            val totalExpenses = weekEntries.filter{!it.isIncome }.sumOf{
+                it.weeklyAmount
+            }
+            WeekSummary(
+                weekStart = weekStart.toString(),
+                weekEnd = weekEnd.toString(),
+                entries = weekEntries,
+                totalIncome = totalIncome,
+                totalExpenses = totalExpenses,
+                netBalance = totalIncome - totalExpenses
+            )
+        }.sortedByDescending{it.weekStart}
     }
 }
