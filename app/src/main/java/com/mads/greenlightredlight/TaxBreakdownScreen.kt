@@ -40,6 +40,10 @@ fun TaxBreakdownScreen(navController: NavController, viewModel: BudgetViewModel,
                 val federalTax = TaxCalculator.calculateFederalTax(gross)
                 val socialSecurity = TaxCalculator.calculateSocialSecurity(gross)
                 val medicare = TaxCalculator.calculateMedicare(gross)
+                val njStateTax = TaxCalculator.calculateNJStateTax(gross)
+                val sdi = TaxCalculator.calculateSDI(gross)
+                val sui = TaxCalculator.calculateSUI(gross)
+                val fli = TaxCalculator.calculateFLI(gross)
                 val netTakeHome = TaxCalculator.calculateNetTakeHome(gross)
 
                 Card(
@@ -93,10 +97,50 @@ fun TaxBreakdownScreen(navController: NavController, viewModel: BudgetViewModel,
                         )
                     }
                 }
+
+                HorizontalDivider(color = Color(0xFF2A2A4A))
+                Text(
+                    text = "NJ State Deductions",
+                    color = MutedText,
+                    fontSize = 11.sp
+                )
+
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = DarkCard),
+                    shape = RoundedCornerShape(12.dp),
+                ){
+                    Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        TaxBreakdownRow(
+                            label = "NJ State income tax",
+                            amount = njStateTax,
+                            isDeduction = true
+                        )
+                        HorizontalDivider(color = Color(0xFF2A2A4A))
+                        TaxBreakdownRow(
+                            label  = "State Disability Insurance (0.19%)",
+                            amount  = sdi,
+                            isDeduction = true
+                        )
+                        HorizontalDivider(color = Color(0xFF2A2A4A))
+                        TaxBreakdownRow(
+                            label = "State Unemployment Insurance (0.43%)",
+                            amount = sui,
+                            isDeduction = true
+                        )
+                        HorizontalDivider(color = Color(0xFF2A2A4A))
+                        TaxBreakdownRow(
+                            label = "State Family Leave Insurance (0.09%)",
+                            amount = fli,
+                            isDeduction = true
+                        )
+                    }
+                }
+
                 Card(
                     colors = CardDefaults.cardColors(containerColor = Color(0xFF0D3B2E)),
                     shape = RoundedCornerShape(12.dp),
-                ){
+                )
+                {
                     Column(modifier = Modifier.padding(12.dp)){
                         Text("Net take-home", color = MutedText, fontSize = 11.sp)
                         Text(
@@ -107,6 +151,7 @@ fun TaxBreakdownScreen(navController: NavController, viewModel: BudgetViewModel,
                         )
                     }
                 }
+
                 Button(
                     onClick = {
                         CsvExporter.exportSingleEntry(context, entry)
@@ -115,7 +160,8 @@ fun TaxBreakdownScreen(navController: NavController, viewModel: BudgetViewModel,
                     colors = ButtonDefaults.buttonColors(containerColor = DarkCard),
                     shape = RoundedCornerShape(12.dp)
                 ){
-                    Text("⬇ Download as CSV",
+                    Text(
+                        text = "⬇ Download as CSV",
                         color=Color.White,
                         fontWeight = FontWeight.Medium
                     )

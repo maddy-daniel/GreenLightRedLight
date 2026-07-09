@@ -41,7 +41,7 @@ fun AllTaxBreakdownScreen(navController: NavController, viewModel:BudgetViewMode
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Federal Deductions for All Income Entries",
+                    text = "Federal and NJ State Deductions for All Hourly Income Entries",
                     color = MutedText,
                     fontSize = 12.sp
                 )
@@ -53,7 +53,7 @@ fun AllTaxBreakdownScreen(navController: NavController, viewModel:BudgetViewMode
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            text = "No income entries yet. Add an income entry to see your tax breakdown.",
+                            text = "No hourly income entries yet. Add an hourly income entry to see your tax breakdown.",
                             color = MutedText,
                             fontSize = 12.sp,
                             modifier = Modifier.padding(16.dp)
@@ -66,6 +66,10 @@ fun AllTaxBreakdownScreen(navController: NavController, viewModel:BudgetViewMode
                     val federalTax = TaxCalculator.calculateFederalTax(gross)
                     val socialSecurity = TaxCalculator.calculateSocialSecurity(gross)
                     val medicare = TaxCalculator.calculateMedicare(gross)
+                    val njStateTax = TaxCalculator.calculateNJStateTax(gross)
+                    val sdi = TaxCalculator.calculateSDI(gross)
+                    val sui = TaxCalculator.calculateSUI(gross)
+                    val fli = TaxCalculator.calculateFLI(gross)
                     val netTakeHome = TaxCalculator.calculateNetTakeHome(gross)
 
                     Card(
@@ -104,6 +108,28 @@ fun AllTaxBreakdownScreen(navController: NavController, viewModel:BudgetViewMode
                             TaxBreakdownRow(
                                 label = "Medicare (1.45%)",
                                 amount = medicare,
+                                isDeduction = true
+                            )
+
+                            HorizontalDivider(color = Color(0xFF2A2A4A))
+                            TaxBreakdownRow(
+                                label = "NJ State Income Tax",
+                                amount = njStateTax,
+                                isDeduction = true
+                            )
+                            TaxBreakdownRow(
+                                label = "SDI (0.19%)",
+                                amount = sdi,
+                                isDeduction = true
+                            )
+                            TaxBreakdownRow(
+                                label = "SUI (0.43%)",
+                                amount = sui,
+                                isDeduction = true
+                            )
+                            TaxBreakdownRow(
+                                label = "FLI (0.09%)",
+                                amount = fli,
                                 isDeduction = true
                             )
 
