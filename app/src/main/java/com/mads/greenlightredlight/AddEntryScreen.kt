@@ -1,5 +1,7 @@
 package com.mads.greenlightredlight
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -230,6 +232,7 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel) {
                         value = hourlyRate,
                         onValueChange = {
                             hourlyRate = it
+                            Log.d(TAG, "hourlyRate input changed: raw='$it'")
                             val rate = it.toDoubleOrNull() ?: 0.0
                             val hours = hoursWorked.toDoubleOrNull() ?: 0.0
                             amount = (rate * hours).toString()
@@ -253,6 +256,7 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel) {
                         value = hoursWorked,
                         onValueChange = {
                             hoursWorked = it
+                            Log.d(TAG, "hoursWorked input changed: raw='$it'")
                             val rate = hourlyRate.toDoubleOrNull() ?: 0.0
                             val hours = it.toDoubleOrNull() ?: 0.0
                             amount = (rate * hours).toString()
@@ -295,6 +299,7 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel) {
                 Button(
                     onClick = {
                         val parsedAmount = amount.toDoubleOrNull() ?: 0.0
+                        Log.d(TAG, "Save tapped: name = '$name', amount = '$amount', parsedAmount = $parsedAmount',isHourly = $isHourly, hourlyRate = '$hourlyRate', hoursWorked='$hoursWorked'")
                         if (name.isNotBlank() && parsedAmount > 0) {
                             val weeklyAmount = when {
                                 !isIncome && isMonthlyExpense -> parsedAmount / 4.2
@@ -307,6 +312,8 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel) {
                                 }
                                 else -> parsedAmount
                             }
+                            Log.d(TAG, "Validation passed. weeklyAmount=$weeklyAmount. Attempting insert...")
+
                             viewModel.addEntry(
                                 Entry(
                                     id = 0,
@@ -320,7 +327,11 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel) {
                                     dateAdded = java.time.LocalDate.now().toString()
                                 )
                             )
+                            Log.d(TAG, "Entry submitted to ViewModel successfully")
                             navController.popBackStack()
+                        }
+                        else{
+                            Log.d(TAG, "Validation FAILED: name.isNotBlank()=${name.isNotBlank()}, parsedAmount>0 = ${parsedAmount>0}")
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),

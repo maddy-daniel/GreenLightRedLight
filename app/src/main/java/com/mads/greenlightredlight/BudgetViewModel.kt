@@ -1,10 +1,10 @@
 package com.mads.greenlightredlight
 
+import android.util.Log
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.SharingStarted
-
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -48,7 +48,9 @@ class BudgetViewModel(private val entryDao: EntryDao, private val context: Conte
     }
     fun addEntry(entry: Entry) {
         viewModelScope.launch {
+            Log.d("AddEntryDebug", "ViewModel.addEntry called with: $entry")
             entryDao.insertEntry(entry)
+            Log.d("AddEntryDebug", "entryDao.insertEntry completed for: ${entry.name}")
         }
     }
 
