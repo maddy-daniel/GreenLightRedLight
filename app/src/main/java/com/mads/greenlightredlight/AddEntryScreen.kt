@@ -1,5 +1,6 @@
 package com.mads.greenlightredlight
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,6 +20,20 @@ import androidx.compose.material3.IconButton
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.background
 
+private const val TAG = "AddEntryDebug"
+
+// Keeps only digits and a single decimal point so stray characters such as
+// (spaces, commas, letters, pasted text, etc.) can never sneak into a numeric
+// field regardless of how they were typed/entered.
+private fun filterNumericInput(input: String): String{
+    val digitsAndDot = input.filter {it.isDigit() || it == '.' }
+    val firstDotIndex = digitsAndDot.indexOf('.')
+    if(firstDotIndex == -1)
+        return digitsAndDot
+    val before = digitsAndDot.substring(0, firstDotIndex+1)
+    val after = digitsAndDot.substring(firstDotIndex+1).replace(".", "")
+    return before + after
+}
 @Composable
 fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel) {
     var isIncome by remember  {mutableStateOf(true)}
@@ -30,6 +45,10 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel) {
     var isMonthlyExpense by remember {mutableStateOf(false)}
     var hourlyRate by remember { mutableStateOf("") }
     var hoursWorked by remember { mutableStateOf("") }
+    var nameError by remember { mutableStateOf<String?>(null) }
+    var amountError by remember { mutableStateOf<String?>(null) }
+    var hourlyRateError by remember { mutableStateOf<String?>(null) }
+    var hoursWorkedError by remember { mutableStateOf<String?>(null) }
 
 
     Surface(
@@ -190,7 +209,9 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel) {
                 Text("Name", color = MutedText, fontSize = 11.sp)
                 OutlinedTextField(
                     value = name,
-                    onValueChange = {name = it},
+                    onValueChange = {
+                        name = it
+                        nameError = null },
                     placeholder = {Text("e.g. Paycheck", color = MutedText)},
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -204,11 +225,24 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel) {
                     ),
                     shape = RoundedCornerShape(8.dp)
                 )
+                nameError?.let{
+                    Text(
+                        text = it,
+                        color = Red,
+                        fontSize = 11.sp,
+                        modifier = Modifier.offset(y= (-6).dp)
+                    )
+                }
                 if(!isHourly || !isIncome){
                     Text("Amount ($)", color = MutedText, fontSize = 11.sp)
                     OutlinedTextField(
                         value = amount,
-                        onValueChange = {amount = it},
+                        onValueChange = {input->
+                            val filtered = filterNumericInput(input)
+                            amount = filtered
+                            amountError = null
+                            Log.d(TAG, "amount input changed: raw='$input', filtered ='$filtered'")
+                        },
                         placeholder = {Text("0.00", color = MutedText)},
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -223,16 +257,30 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel) {
                         ),
                         shape = RoundedCornerShape(8.dp)
                     )
+                    amountError?.let{
+                        Text(
+                            text = it,
+                            color = Red,
+                            fontSize = 11.sp,
+                            modifier = Modifier.offset(y = (-6).dp)
+                        )
+                    }
                 }
                 else{
                     Text("Pay rate ($/hr)", color = MutedText, fontSize = 11.sp)
                     OutlinedTextField(
                         value = hourlyRate,
-                        onValueChange = {
-                            hourlyRate = it
-                            val rate = it.toDoubleOrNull() ?: 0.0
-                            val hours = hoursWorked.toDoubleOrNull() ?: 0.0
-                            amount = (rate * hours).toString()
+                        onValueChange = {input->
+                            val filtered = filterNumericInput(input)
+                            hourlyRate = filtered
+                            hourlyRateError = null
+                            Log.d(TAG,"hourlyRate input changed: raw='$input', filtered ='$filtered'")
+
+                            val rate = filtered.toDoubleOrNull() ?:0.0
+                            val hours = hoursWorked.toDoubleOrNull() ?:0.0
+                            amount = (rate*hours).toString()
+                            amountError = null
+                            Log.d(TAG, "Calculated amount = $amount")
                         },
                         placeholder = {Text("0.00", color = MutedText)},
                         modifier = Modifier.fillMaxWidth(),
@@ -248,14 +296,27 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel) {
                         ),
                         shape = RoundedCornerShape(8.dp)
                     )
+                    hourlyRateError?.let{
+                        Text(
+                            text = it,
+                            color = Red,
+                            fontSize = 11.sp,
+                            modifier = Modifier.offset(y = (-6).dp)
+                        )
+                    }
                     Text("Hours worked", color = MutedText, fontSize = 11.sp)
                     OutlinedTextField(
                         value = hoursWorked,
-                        onValueChange = {
-                            hoursWorked = it
-                            val rate = hourlyRate.toDoubleOrNull() ?: 0.0
-                            val hours = it.toDoubleOrNull() ?: 0.0
-                            amount = (rate * hours).toString()
+                        onValueChange = { input->
+                            val filtered = filterNumericInput(input)
+                            hoursWorked = filtered
+                            hoursWorkedError = null
+                            Log.d(TAG, "hoursWorked input changed: raw='$input', filtered ='$filtered'")
+
+                            val rate = hourlyRate.toDoubleOrNull() ?:0.0
+                            val hours = filtered.toDoubleOrNull() ?:0.0
+                            amount = (rate*hours).toString()
+                            Log.d(TAG, "Calculated amount = $amount")
                         },
                         placeholder = {Text("0.00", color = MutedText)},
                         modifier = Modifier.fillMaxWidth(),
@@ -268,9 +329,17 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel) {
                             focusedContainerColor = DarkCard,
                             unfocusedContainerColor = DarkCard,
                             cursorColor = Teal
-                        ),
+                         ),
                         shape = RoundedCornerShape(8.dp)
                     )
+                    hoursWorkedError?.let{
+                        Text(
+                            text = it,
+                            color = Red,
+                            fontSize = 11.sp,
+                            modifier = Modifier.offset(y = (-6).dp)
+                        )
+                    }
                     if (amount.toDoubleOrNull() != null && amount.toDouble() > 0.0) {
                         Card(
                             colors = CardDefaults.cardColors(containerColor = Color(0xFF0D3B2E)),
@@ -295,7 +364,16 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel) {
                 Button(
                     onClick = {
                         val parsedAmount = amount.toDoubleOrNull() ?: 0.0
-                        if (name.isNotBlank() && parsedAmount > 0) {
+                        Log.d(TAG, "Save tapped: name = '$name', amount = '$amount', parsedAmount = $parsedAmount',isHourly = $isHourly, hourlyRate = '$hourlyRate', hoursWorked='$hoursWorked'")
+
+                        nameError =  if(name.isBlank()) "Please enter a name" else null
+                        hourlyRateError = if(isHourly && isIncome && hourlyRate.isBlank()) "Please enter pay rate" else null
+                        hoursWorkedError = if(isHourly && isIncome && hoursWorked.isBlank()) "Please enter hours worked" else null
+                        amountError = if(parsedAmount<= 0.0 && hourlyRateError == null && hoursWorkedError == null) "Please enter a valid amount greater than 0.0" else null
+
+                        val hasError = nameError != null || hourlyRateError != null || hoursWorkedError != null || amountError != null
+
+                        if (!hasError) {
                             val weeklyAmount = when {
                                 !isIncome && isMonthlyExpense -> parsedAmount / 4.2
                                 isIncome -> when (frequency) {
@@ -307,6 +385,8 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel) {
                                 }
                                 else -> parsedAmount
                             }
+                            Log.d(TAG, "Validation passed. weeklyAmount=$weeklyAmount. Attempting insert...")
+
                             viewModel.addEntry(
                                 Entry(
                                     id = 0,
@@ -320,7 +400,11 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel) {
                                     dateAdded = java.time.LocalDate.now().toString()
                                 )
                             )
+                            Log.d(TAG, "Entry submitted to ViewModel successfully")
                             navController.popBackStack()
+                        }
+                        else{
+                            Log.d(TAG, "Validation FAILED: nameError = $nameError, hourlyRateError = $hourlyRateError, hoursWorkedError = $hoursWorkedError, amountError = $amountError")
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
