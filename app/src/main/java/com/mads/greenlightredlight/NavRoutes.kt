@@ -10,5 +10,6 @@ object NavRoutes {
     const val ALL_TAX_BREAKDOWN = "all_tax_breakdown"
     const val CALENDAR = "calendar"
     const val HISTORY = "history"
+    const val SETTINGS = "settings"
 
 }

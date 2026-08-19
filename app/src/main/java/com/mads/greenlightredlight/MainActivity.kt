@@ -2,7 +2,7 @@ package com.mads.greenlightredlight
 
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.ComponentActivity
+import androidx.fragment.app.FragmentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.WindowInsets
@@ -28,9 +28,16 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
+import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
+import androidx.compose.runtime.remember
 import com.mads.greenlightredlight.ui.GreenLightRedLightTheme
 private const val TAG = "WelcomeScreenDebug"
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -48,6 +55,51 @@ class MainActivity : ComponentActivity() {
 
                 Log.d(TAG, "NavHost composing. currentRoute = $currentRoute")
 
+                //App Lock: if enabled in Settings, the user must pass biometric authentication
+                //before any screen content is shown.
+                val isLockEnabled = SecurePrefs.isLockEnabled(applicationContext)
+                var isAuthenticated by rememberSaveable { mutableStateOf(!isLockEnabled) }
+                var authTrigger by remember { mutableStateOf(0) }
+
+                LaunchedEffect(authTrigger) {
+                    if (!isAuthenticated && isLockEnabled) {
+                        val biometricManager = BiometricManager.from(this@MainActivity)
+                        val canAuthenticate = biometricManager.canAuthenticate(
+                            BiometricManager.Authenticators.BIOMETRIC_WEAK or
+                                    BiometricManager.Authenticators.DEVICE_CREDENTIAL
+                        )
+                        if (canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS) {
+                            val executor = ContextCompat.getMainExecutor(this@MainActivity)
+                            val biometricPrompt = BiometricPrompt(
+                                this@MainActivity,
+                                executor,
+                                object : BiometricPrompt.AuthenticationCallback() {
+                                    override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                                        super.onAuthenticationSucceeded(result)
+                                        isAuthenticated = true
+                                        Log.d(TAG, "Biometric  auth succeeded")
+                                    }
+
+                                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                                        super.onAuthenticationError(errorCode, errString)
+                                        Log.d(TAG, "Biometric auth failed")
+                                    }
+                                }
+                            )
+                            val promptInfo =
+                                BiometricPrompt.PromptInfo.Builder().setTitle("Unlock Green Light Red Light")
+                                    .setSubtitle("Authenticate to view your financial data").setAllowedAuthenticators(
+                                        BiometricManager.Authenticators.BIOMETRIC_WEAK
+                                                or BiometricManager.Authenticators.DEVICE_CREDENTIAL
+                                    ).build()
+                            biometricPrompt.authenticate(promptInfo)
+                        } else {
+                            //No biometric/PIN set up on this device - don't lock the user out.
+                            Log.d(TAG, "No biometric/device credential available, skipping lock")
+                            isAuthenticated = true
+                        }
+                    }
+                }
                 //Show the Welcome screen every time the app is opened, not just on the very first launch.
                 //startDestination = WELCOME already handles the first launch, so this only needs to act
                 // on later ON_START events.
@@ -56,16 +108,17 @@ class MainActivity : ComponentActivity() {
                 val lifecycleOwner = LocalLifecycleOwner.current
 
                 DisposableEffect(lifecycleOwner) {
-                    val observer = LifecycleEventObserver{ _, event->
-                        when(event){
+                    val observer = LifecycleEventObserver { _, event ->
+                        when (event) {
                             Lifecycle.Event.ON_STOP -> {
                                 //Cover the screen before background so Android's task-switcher
                                 //snapshot captures the cover, not the last real screen (e.g. Home)
-                                if(!isFirstLaunch) {
+                                if (!isFirstLaunch) {
                                     isTransitioning = true
-                                    Log.d(TAG,"ON_STOP: covering screen before backgrounding")
+                                    Log.d(TAG, "ON_STOP: covering screen before backgrounding")
                                 }
                             }
+
                             Lifecycle.Event.ON_START -> {
                                 if (isFirstLaunch) {
                                     isFirstLaunch = false
@@ -74,27 +127,27 @@ class MainActivity : ComponentActivity() {
                                     isTransitioning = true
                                     Log.d(TAG, "ON_START: app reopened, navigating back to WELCOME")
 
-                                    navController.navigate(NavRoutes.WELCOME){
+                                    navController.navigate(NavRoutes.WELCOME) {
                                         popUpTo(navController.graph.startDestinationId) {
                                             inclusive = true
                                         }
                                         launchSingleTop = true
                                     }
                                     isTransitioning = false
+                                    Log.d(TAG, "Cover cleared after navigating to WELCOME")
+                                }
+                                if (isLockEnabled) {
+                                    isAuthenticated = false
+                                    authTrigger++
                                 }
                             }
-                            else->{}
+
+                            else -> {}
                         }
                     }
                     lifecycleOwner.lifecycle.addObserver(observer)
                     onDispose {
                         lifecycleOwner.lifecycle.removeObserver(observer)
-                    }
-                }
-                //Once the WELCOME route has actually composed, it's safe to remove the overlay.
-                LaunchedEffect(currentRoute) {
-                    if (currentRoute == NavRoutes.WELCOME) {
-                        isTransitioning = false
                     }
                 }
 
@@ -103,89 +156,108 @@ class MainActivity : ComponentActivity() {
                     NavRoutes.HISTORY,
                     NavRoutes.CALENDAR
                 )
-                Box(modifier = Modifier.fillMaxSize()) {
+                if (!isAuthenticated) {
                     Surface(
-                        modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars)
-                        //Should now show navigation bar and top bar of phone
+                        modifier = Modifier.fillMaxSize(),
+                        color = NavyBackground
                     ) {
-                        Scaffold(
-                            bottomBar = {
-                                if (currentRoute in bottomNavRoutes) {
-                                    BottomNavBar(
-                                        currentRoute = currentRoute,
-                                        onHomeClick = {
-                                            navController.navigate(NavRoutes.HOME) {
-                                                popUpTo(NavRoutes.HOME) {
-                                                    inclusive = true
+                        Box(modifier = Modifier.fillMaxSize()){
+                            Text(
+                                text = "\uD83D\uDD12 Locked",
+                                color = Color.White,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
+                    }
+                } else {
+
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Surface(
+                            modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars)
+                            //Should now show navigation bar and top bar of phone
+                        ) {
+                            Scaffold(
+                                bottomBar = {
+                                    if (currentRoute in bottomNavRoutes) {
+                                        BottomNavBar(
+                                            currentRoute = currentRoute,
+                                            onHomeClick = {
+                                                navController.navigate(NavRoutes.HOME) {
+                                                    popUpTo(NavRoutes.HOME) {
+                                                        inclusive = true
+                                                    }
+                                                }
+                                            },
+                                            onHistoryClick = {
+                                                navController.navigate(NavRoutes.HISTORY) {
+                                                    popUpTo(NavRoutes.HOME)
+                                                }
+
+                                            },
+                                            onCalendarClick = {
+                                                navController.navigate(NavRoutes.CALENDAR) {
+                                                    popUpTo(NavRoutes.HOME)
                                                 }
                                             }
-                                        },
-                                        onHistoryClick = {
-                                            navController.navigate(NavRoutes.HISTORY) {
-                                                popUpTo(NavRoutes.HOME)
-                                            }
+                                        )
 
-                                        },
-                                        onCalendarClick = {
-                                            navController.navigate(NavRoutes.CALENDAR) {
-                                                popUpTo(NavRoutes.HOME)
-                                            }
-                                        }
-                                    )
+                                    }
 
                                 }
 
-                            }
+                            )
+                            { paddingValues ->
+                                NavHost(
+                                    navController = navController,
+                                    startDestination = NavRoutes.WELCOME,
+                                    modifier = Modifier.padding(paddingValues)
+                                ) {
+                                    composable(NavRoutes.WELCOME) {
+                                        WelcomeScreen(navController = navController)
+                                    }
+                                    composable(NavRoutes.HELP) {
+                                        HelpScreen(navController = navController)
+                                    }
 
-                        )
-                        { paddingValues ->
-                            NavHost(
-                                navController = navController,
-                                startDestination = NavRoutes.WELCOME,
-                                modifier = Modifier.padding(paddingValues)
-                            ) {
-                                composable(NavRoutes.WELCOME) {
-                                    WelcomeScreen(navController = navController)
-                                }
-                                composable(NavRoutes.HELP) {
-                                    HelpScreen(navController = navController)
-                                }
-
-                                composable(NavRoutes.HOME) {
-                                    HomeScreen(navController = navController, viewModel = viewModel)
-                                }
-                                composable(NavRoutes.ADD_ENTRY) {
-                                    AddEntryScreen(navController = navController, viewModel = viewModel)
-                                }
-                                composable(NavRoutes.DELETE_ENTRY) {
-                                    DeleteEntryScreen(navController = navController, viewModel = viewModel)
-                                }
-                                composable(NavRoutes.TAX_BREAKDOWN) { backStackEntry ->
-                                    val entryId = backStackEntry.arguments?.getString("entryId")?.toIntOrNull() ?: 0
-                                    TaxBreakdownScreen(
-                                        navController = navController,
-                                        viewModel = viewModel,
-                                        entryId = entryId
-                                    )
-                                }
-                                composable(NavRoutes.ALL_TAX_BREAKDOWN) {
-                                    AllTaxBreakdownScreen(navController = navController, viewModel = viewModel)
-                                }
-                                composable(NavRoutes.CALENDAR) {
-                                    CalendarScreen(navController = navController, viewModel = viewModel)
-                                }
-                                composable(NavRoutes.HISTORY) {
-                                    HistoryScreen(navController = navController, viewModel = viewModel)
+                                    composable(NavRoutes.HOME) {
+                                        HomeScreen(navController = navController, viewModel = viewModel)
+                                    }
+                                    composable(NavRoutes.ADD_ENTRY) {
+                                        AddEntryScreen(navController = navController, viewModel = viewModel)
+                                    }
+                                    composable(NavRoutes.DELETE_ENTRY) {
+                                        DeleteEntryScreen(navController = navController, viewModel = viewModel)
+                                    }
+                                    composable(NavRoutes.TAX_BREAKDOWN) { backStackEntry ->
+                                        val entryId = backStackEntry.arguments?.getString("entryId")?.toIntOrNull() ?: 0
+                                        TaxBreakdownScreen(
+                                            navController = navController,
+                                            viewModel = viewModel,
+                                            entryId = entryId
+                                        )
+                                    }
+                                    composable(NavRoutes.ALL_TAX_BREAKDOWN) {
+                                        AllTaxBreakdownScreen(navController = navController, viewModel = viewModel)
+                                    }
+                                    composable(NavRoutes.CALENDAR) {
+                                        CalendarScreen(navController = navController, viewModel = viewModel)
+                                    }
+                                    composable(NavRoutes.HISTORY) {
+                                        HistoryScreen(navController = navController, viewModel = viewModel)
+                                    }
+                                    composable(NavRoutes.SETTINGS) {
+                                        SettingsScreen(navController = navController)
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    if (isTransitioning) {
-                        Surface(
-                            modifier = Modifier.fillMaxSize(),
-                            color = NavyBackground
-                        ) {}
+                        if (isTransitioning) {
+                            Surface(
+                                modifier = Modifier.fillMaxSize(),
+                                color = NavyBackground
+                            ) {}
+                        }
                     }
                 }
             }
