@@ -29,7 +29,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.mads.greenlightredlight.ui.GreenLightRedLightTheme
-
 private const val TAG = "WelcomeScreenDebug"
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
