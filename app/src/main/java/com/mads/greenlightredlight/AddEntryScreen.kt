@@ -35,14 +35,23 @@ private fun filterNumericInput(input: String): String{
     return before + after
 }
 @Composable
-fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel) {
-    var isIncome by remember  {mutableStateOf(true)}
-    var isRecurring by remember {mutableStateOf(true)}
-    var isHourly by remember { mutableStateOf(false) }
-    var name by remember {mutableStateOf("")}
-    var amount by remember { mutableStateOf("") }
-    var frequency by remember{mutableStateOf("Weekly")}
-    var isMonthlyExpense by remember {mutableStateOf(false)}
+fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, entryId: Int?= null) {
+    val existingEntry = remember(entryId){
+        entryId?.let{
+            viewModel.getEntryById(it)
+        }
+    }
+    val isEditing = existingEntry != null
+
+    Log.d(TAG, "AddEntryScreen composed: entryId = $entryId, existingEntry = $existingEntry, isEditing = $isEditing")
+
+    var isIncome by remember  {mutableStateOf(existingEntry?.isIncome ?: true)}
+    var isRecurring by remember {mutableStateOf(existingEntry?.isRecurring ?: true)}
+    var isHourly by remember { mutableStateOf(existingEntry?.isHourly ?: false) }
+    var name by remember {mutableStateOf(existingEntry?.name ?: "")}
+    var amount by remember { mutableStateOf(existingEntry?.amount?.toString() ?: "") }
+    var frequency by remember{mutableStateOf(existingEntry?.frequency ?: "Weekly")}
+    var isMonthlyExpense by remember {mutableStateOf(existingEntry?.let{!it.isIncome && it.frequency == "Monthly"}?:false)}
     var hourlyRate by remember { mutableStateOf("") }
     var hoursWorked by remember { mutableStateOf("") }
     var nameError by remember { mutableStateOf<String?>(null) }
@@ -62,7 +71,12 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel) {
                 modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 16.dp, end = 16.dp,top=16.dp, bottom = 32.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ){
-                Text("Add Entry", color = if (isIncome) Teal else Red, fontSize = 18.sp, fontWeight = FontWeight.Medium)
+                Text(
+                    if(isEditing)"Edit Entry" else "Add Entry",
+                        color = if (isIncome) Teal else Red,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium
+                 )
 
                 Text("Type", color = MutedText, fontSize= 11.sp)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -387,9 +401,9 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel) {
                             }
                             Log.d(TAG, "Validation passed. weeklyAmount=$weeklyAmount. Attempting insert...")
 
-                            viewModel.addEntry(
+                            val entryToSave =
                                 Entry(
-                                    id = 0,
+                                    id = existingEntry?.id?:0,
                                     name = name,
                                     amount = parsedAmount,
                                     weeklyAmount = weeklyAmount,
@@ -397,10 +411,17 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel) {
                                     isRecurring = isRecurring,
                                     isHourly = isHourly,
                                     frequency = if(isIncome) frequency else if (isMonthlyExpense)"Monthly" else "Weekly",
-                                    dateAdded = java.time.LocalDate.now().toString()
+                                    dateAdded = existingEntry?.dateAdded?:java.time.LocalDate.now().toString()
                                 )
-                            )
-                            Log.d(TAG, "Entry submitted to ViewModel successfully")
+                            if(isEditing){
+                                viewModel.updateEntry(entryToSave)
+                                Log.d(TAG, "Entry updated successfully")
+                            }
+                            else{
+                                viewModel.addEntry(entryToSave)
+                                Log.d(TAG, "Entry submitted to ViewModel successfully")
+                            }
+
                             navController.popBackStack()
                         }
                         else{
@@ -411,7 +432,7 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel) {
                     colors = ButtonDefaults.buttonColors(containerColor =  if(isIncome) Teal else Red),
                     shape = RoundedCornerShape(8.dp)
                 ){
-                    Text("Save Entry", color = NavyBackground, fontWeight = FontWeight.Medium)
+                    Text(if(isEditing) "Update Entry" else "Save Entry", color = NavyBackground, fontWeight = FontWeight.Medium)
                 }
                 OutlinedButton(
                     onClick = {navController.popBackStack() },
