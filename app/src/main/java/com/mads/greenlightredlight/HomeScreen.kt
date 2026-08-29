@@ -29,6 +29,7 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
     val entries by viewModel.entries.collectAsState()
     val incomeEntries = entries.filter{it.isIncome}
     val expenseEntries = entries.filter{!it.isIncome}
+    var selectedTab by remember{mutableStateOf(0)}
     val net = viewModel.netBalance()
     val totalIncome = viewModel.totalIncome()
     val totalExpense = viewModel.totalExpenses()
@@ -172,33 +173,145 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                     )
                 }
             }
-            item {
-                Text("INCOME ENTRIES", color = MutedText, fontSize = 9.sp)
-            }
-
-            if (incomeEntries.isEmpty()) {
-                item {
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = DarkCard),
-                        shape = RoundedCornerShape(6.dp)
-                    ) {
+            item{
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)){
+                    Button(
+                        onClick = {selectedTab = 0},
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (selectedTab == 0) Teal else DarkCard
+                        ),
+                        shape = RoundedCornerShape(8.dp)
+                    ){
                         Text(
-                            "No entries yet",
-                            color = MutedText,
-                            fontSize = 11.sp,
-                            modifier = Modifier.padding(10.dp)
+                            text = "Income",
+                            color = if(selectedTab == 0) NavyBackground else MutedText
+                        )
+                    }
+                    Button(
+                        onClick = {selectedTab = 1},
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (selectedTab == 1) Red else DarkCard
+                        ),
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                    {
+                        Text(
+                            text = "Expenses",
+                            color = if(selectedTab == 1) Color.White else MutedText
                         )
                     }
                 }
-            } else {
-                items(incomeEntries) { entry ->
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = DarkCard),
-                        shape = RoundedCornerShape(6.dp)
-                    ) {
-                        Column(modifier = Modifier.padding(10.dp)) {
+            }
+            if(selectedTab == 0) {
+
+                item {
+                    Text("INCOME ENTRIES", color = MutedText, fontSize = 9.sp)
+                }
+
+                if (incomeEntries.isEmpty()) {
+                    item {
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = DarkCard),
+                            shape = RoundedCornerShape(6.dp)
+                        ) {
+                            Text(
+                                "No entries yet",
+                                color = MutedText,
+                                fontSize = 11.sp,
+                                modifier = Modifier.padding(10.dp)
+                            )
+                        }
+                    }
+                } else {
+                    items(incomeEntries) { entry ->
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = DarkCard),
+                            shape = RoundedCornerShape(6.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(10.dp)) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        "${entry.name} — ${if (entry.isRecurring) "Recurring" else "Incidental"} — ${entry.frequency}",
+                                        color = Color.White,
+                                        fontSize = 11.sp
+                                    )
+                                    if (entry.isHourly) {
+                                        val netTakeHome = TaxCalculator.calculateNetTakeHome(entry.weeklyAmount)
+                                        Column(horizontalAlignment = Alignment.End) {
+                                            Text(
+                                                text = "After Tax",
+                                                color = MutedText,
+                                                fontSize = 9.sp
+                                            )
+                                            Text(
+                                                text = "$${String.format("%.2f", netTakeHome)}/wk",
+                                                color = Teal,
+                                                fontSize = 11.sp,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                        }
+                                    } else {
+                                        Text(
+                                            text = "$%.2f/wk".format(entry.weeklyAmount),
+                                            color = Teal,
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                }
+                                if (entry.isHourly) {
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    OutlinedButton(
+                                        onClick = {
+                                            navController.navigate("tax_breakdown/${entry.id}")
+                                        },
+                                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
+                                        modifier = Modifier.height(28.dp),
+                                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Teal),
+                                        border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(width = 1.dp)
+                                    ) {
+                                        Text("📄 View tax breakdown", fontSize = 9.sp)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if(selectedTab == 1) {
+                item {
+                    Text("EXPENSE ENTRIES", color = MutedText, fontSize = 9.sp)
+                }
+
+                if (expenseEntries.isEmpty()) {
+                    item {
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = DarkCard),
+                            shape = RoundedCornerShape(6.dp)
+                        ) {
+                            Text(
+                                "No entries yet",
+                                color = MutedText,
+                                fontSize = 11.sp,
+                                modifier = Modifier.padding(10.dp)
+                            )
+                        }
+                    }
+                } else {
+                    items(expenseEntries) { entry ->
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = DarkCard),
+                            shape = RoundedCornerShape(6.dp)
+                        ) {
                             Row(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(10.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
@@ -206,90 +319,13 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                                     color = Color.White,
                                     fontSize = 11.sp
                                 )
-                                if(entry.isHourly){
-                                    val netTakeHome = TaxCalculator.calculateNetTakeHome(entry.weeklyAmount)
-                                    Column(horizontalAlignment = Alignment.End){
-                                        Text(
-                                            text = "After Tax",
-                                            color = MutedText,
-                                            fontSize = 9.sp
-                                        )
-                                        Text(
-                                            text = "$${String.format("%.2f", netTakeHome)}/wk",
-                                            color = Teal,
-                                            fontSize = 11.sp,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                    }
-                                }
-                                else{
-                                    Text(
-                                        text = "$%.2f/wk".format(entry.weeklyAmount),
-                                        color = Teal,
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                }
+                                Text(
+                                    "$%.2f/wk".format(entry.weeklyAmount),
+                                    color = Red,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
                             }
-                            if(entry.isHourly) {
-                                Spacer(modifier = Modifier.height(4.dp))
-                                OutlinedButton(
-                                    onClick = {
-                                        navController.navigate("tax_breakdown/${entry.id}")
-                                    },
-                                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
-                                    modifier = Modifier.height(28.dp),
-                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Teal),
-                                    border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(width = 1.dp)
-                                ) {
-                                    Text("📄 View tax breakdown", fontSize = 9.sp)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            item {
-                Text("EXPENSE ENTRIES", color = MutedText, fontSize = 9.sp)
-            }
-
-            if (expenseEntries.isEmpty()) {
-                item {
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = DarkCard),
-                        shape = RoundedCornerShape(6.dp)
-                    ) {
-                        Text(
-                            "No entries yet",
-                            color = MutedText,
-                            fontSize = 11.sp,
-                            modifier = Modifier.padding(10.dp)
-                        )
-                    }
-                }
-            } else {
-                items(expenseEntries) { entry ->
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = DarkCard),
-                        shape = RoundedCornerShape(6.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(10.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                "${entry.name} — ${if (entry.isRecurring) "Recurring" else "Incidental"} — ${entry.frequency}",
-                                color = Color.White,
-                                fontSize = 11.sp
-                            )
-                            Text("$%.2f/wk".format(entry.weeklyAmount),
-                                color = Red,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Medium
-                            )
                         }
                     }
                 }
