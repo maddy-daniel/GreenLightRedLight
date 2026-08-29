@@ -233,13 +233,25 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                             Column(modifier = Modifier.padding(10.dp)) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
                                         "${entry.name} — ${if (entry.isRecurring) "Recurring" else "Incidental"} — ${entry.frequency}",
                                         color = Color.White,
-                                        fontSize = 11.sp
+                                        fontSize = 11.sp,
+                                        modifier = Modifier.weight(1f)
                                     )
+                                    IconButton(
+                                        onClick={navController.navigate("add_entry?entryId=${entry.id}")},
+                                        modifier = Modifier.size(28.dp)
+                                    ){
+                                        Text(
+                                            text = "✏️",
+                                            fontSize = 12.sp
+                                        )
+                                    }
+
                                     if (entry.isHourly) {
                                         val netTakeHome = TaxCalculator.calculateNetTakeHome(entry.weeklyAmount)
                                         Column(horizontalAlignment = Alignment.End) {
@@ -312,13 +324,25 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(10.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
                                     "${entry.name} — ${if (entry.isRecurring) "Recurring" else "Incidental"} — ${entry.frequency}",
                                     color = Color.White,
-                                    fontSize = 11.sp
+                                    fontSize = 11.sp,
+                                    modifier = Modifier.weight(1f)
                                 )
+                                IconButton(
+                                    onClick = { navController.navigate("add_entry?entryId=${entry.id}") },
+                                    modifier = Modifier.size(28.dp)
+                                )
+                                {
+                                    Text(
+                                        text = "✏️",
+                                        fontSize = 12.sp
+                                    )
+                                }
                                 Text(
                                     "$%.2f/wk".format(entry.weeklyAmount),
                                     color = Red,
@@ -334,7 +358,7 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
             item {
                 Spacer(modifier = Modifier.height(4.dp))
                 Button(
-                    onClick = { navController.navigate(NavRoutes.ADD_ENTRY) },
+                    onClick={navController.navigate(NavRoutes.ADD_ENTRY)},
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Teal),
                     shape = RoundedCornerShape(8.dp)

@@ -54,6 +54,12 @@ class BudgetViewModel(private val entryDao: EntryDao, private val context: Conte
         }
     }
 
+    fun updateEntry(entry: Entry){
+        viewModelScope.launch {
+            entryDao.updateEntry(entry)
+        }
+    }
+
     fun deleteEntry(entryId: Int){
         viewModelScope.launch {
             val entry = entries.value.find{it.id == entryId}

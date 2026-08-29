@@ -264,8 +264,22 @@ class MainActivity : FragmentActivity() {
                                     composable(NavRoutes.HOME) {
                                         HomeScreen(navController = navController, viewModel = viewModel)
                                     }
-                                    composable(NavRoutes.ADD_ENTRY) {
-                                        AddEntryScreen(navController = navController, viewModel = viewModel)
+                                    composable(
+                                        route = NavRoutes.ADD_ENTRY,
+                                        arguments = listOf(
+                                            androidx.navigation.navArgument("entryId"){
+                                                type = androidx.navigation.NavType.StringType
+                                                nullable = true
+                                                defaultValue = null
+                                            }
+                                        )
+                                    ) { backStackEntry ->
+                                        val entryId = backStackEntry.arguments?.getString("entryId")?.toIntOrNull()
+                                        AddEntryScreen(
+                                            navController = navController,
+                                            viewModel = viewModel,
+                                            entryId = entryId
+                                        )
                                     }
                                     composable(NavRoutes.DELETE_ENTRY) {
                                         DeleteEntryScreen(navController = navController, viewModel = viewModel)
