@@ -10,6 +10,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -18,6 +22,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,11 +36,16 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.core.content.ContextCompat
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.remember
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.mads.greenlightredlight.ui.GreenLightRedLightTheme
 private const val TAG = "WelcomeScreenDebug"
 class MainActivity : FragmentActivity() {
@@ -57,14 +68,14 @@ class MainActivity : FragmentActivity() {
 
                 //App Lock: if enabled in Settings, the user must pass biometric authentication
                 //before any screen content is shown.
-                val isLockEnabled = SecurePrefs.isLockEnabled(applicationContext)
-                var isAuthenticated by rememberSaveable { mutableStateOf(!isLockEnabled) }
+                var isAuthenticated by rememberSaveable { mutableStateOf(!SecurePrefs.isLockEnabled(applicationContext)) }
                 var authTrigger by remember { mutableStateOf(0) }
 
                 LaunchedEffect(authTrigger) {
-                    if (!isAuthenticated && isLockEnabled) {
+                    if (!isAuthenticated && SecurePrefs.isLockEnabled(applicationContext)) {
                         val biometricManager = BiometricManager.from(this@MainActivity)
-                        val canAuthenticate = biometricManager.canAuthenticate(
+                        val canAuthenticate
+                        = biometricManager.canAuthenticate(
                             BiometricManager.Authenticators.BIOMETRIC_WEAK or
                                     BiometricManager.Authenticators.DEVICE_CREDENTIAL
                         )
@@ -136,7 +147,7 @@ class MainActivity : FragmentActivity() {
                                     isTransitioning = false
                                     Log.d(TAG, "Cover cleared after navigating to WELCOME")
                                 }
-                                if (isLockEnabled) {
+                                if (SecurePrefs.isLockEnabled(applicationContext)) {
                                     isAuthenticated = false
                                     authTrigger++
                                 }
@@ -161,12 +172,43 @@ class MainActivity : FragmentActivity() {
                         modifier = Modifier.fillMaxSize(),
                         color = NavyBackground
                     ) {
-                        Box(modifier = Modifier.fillMaxSize()){
+                        Column(
+                            modifier = Modifier.fillMaxSize().padding(24.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ){
                             Text(
-                                text = "\uD83D\uDD12 Locked",
-                                color = Color.White,
-                                modifier = Modifier.align(Alignment.Center)
+                                text = "\uD83D\uDD12",
+                                fontSize = 48.sp
                             )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = "App Locked",
+                                color = Color.White,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "Authenticate to view your financial data",
+                                color = MutedText,
+                                fontSize = 13.sp,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(24.dp))
+                            Button(
+                                onClick = {authTrigger++},
+                                colors = ButtonDefaults.buttonColors(containerColor = Teal),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            {
+                                Text(
+                                    text = "Unlock",
+                                    color = NavyBackground,
+                                    fontWeight = FontWeight.Medium,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                )
+                            }
                         }
                     }
                 } else {
