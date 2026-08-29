@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.compose.material3.IconButton
 
 val NavyBackground = Color(0xFF1A1A2E)
 val DarkCard = Color(0xFF16213E)
@@ -51,17 +52,31 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ){
             item {
-                Text(
-                    text = "Green Light Red Light",
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = "NJ Tax Calculator * Weekly Budget",
-                    color = MutedText,
-                    fontSize = 11.sp
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Column{
+                        Text(
+                            text = "Green Light Red Light",
+                            color = Color.White,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Text(
+                            text = "NJ Tax Calculator * Weekly Budget",
+                            color = MutedText,
+                            fontSize = 11.sp
+                        )
+                    }
+                    IconButton(onClick = {navController.navigate(NavRoutes.SETTINGS)}){
+                        Text(
+                            text = "⚙️",
+                            fontSize = 18.sp
+                        )
+                    }
+                }
             }
             item{
                 Card(
