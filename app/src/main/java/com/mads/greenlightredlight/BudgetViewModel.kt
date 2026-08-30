@@ -54,6 +54,14 @@ class BudgetViewModel(private val entryDao: EntryDao, private val context: Conte
         }
     }
 
+    fun setSavingsGoal(amount: Double){
+        prefs.edit().putFloat("savings_goal", amount.toFloat()).apply()
+    }
+
+    fun getSavingsGoal(): Double{
+        return prefs.getFloat("savings_goal", 0f).toDouble()
+    }
+
     fun updateEntry(entry: Entry){
         viewModelScope.launch {
             entryDao.updateEntry(entry)
