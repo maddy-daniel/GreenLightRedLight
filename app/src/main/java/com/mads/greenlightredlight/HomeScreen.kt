@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.material3.IconButton
+import androidx.compose.ui.text.style.TextAlign
 
 val NavyBackground = Color(0xFF1A1A2E)
 val DarkCard = Color(0xFF16213E)
@@ -53,25 +54,29 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ){
             item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-                    Column{
+                Box(modifier = Modifier.fillMaxWidth())
+                {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    )
+                    {
                         Text(
                             text = "Green Light Red Light",
                             color = Color.White,
                             fontSize = 18.sp,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
+                            textAlign = TextAlign.Center,
                         )
                         Text(
                             text = "NJ Tax Calculator * Weekly Budget",
                             color = MutedText,
-                            fontSize = 11.sp
+                            fontSize = 11.sp,
+                            textAlign = TextAlign.Center
                         )
                     }
-                    IconButton(onClick = {navController.navigate(NavRoutes.SETTINGS)}){
+                    IconButton(onClick = {navController.navigate(NavRoutes.SETTINGS)},
+                        modifier = Modifier.align(Alignment.CenterEnd)){
                         Text(
                             text = "⚙️",
                             fontSize = 18.sp
@@ -84,7 +89,10 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                     colors = CardDefaults.cardColors(containerColor = DarkCard),
                     shape = RoundedCornerShape(12.dp)
                 ){
-                    Column(modifier = Modifier.padding(12.dp)) {
+                    Column(
+                        modifier = Modifier.padding(12.dp).fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Text("Weekly net", color = MutedText, fontSize = 11.sp)
                         Text(
                             text = "$%.2f".format(net),
@@ -95,7 +103,55 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                     }
                 }
             }
-
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("◀ Red Light", color = Red, fontSize = 10.sp)
+                        Text("Green Light ▶", color = Teal, fontSize = 10.sp)
+                    }
+                    Box(
+                        modifier = Modifier.fillMaxWidth().height(10.dp)
+                    ){
+                        Row(modifier=Modifier.fillMaxSize()){
+                            Box(
+                                modifier = Modifier.weight(1f).fillMaxHeight().background(
+                                    brush = Brush.horizontalGradient(colors = listOf(Red, DarkCard))
+                                )
+                            )
+                            Box(
+                                modifier = Modifier.weight(1f).fillMaxHeight().background(
+                                    brush = Brush.horizontalGradient(colors = listOf(DarkCard, Teal))
+                                )
+                            )
+                        }
+                        Box(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .width(4.dp)
+                                .align(Alignment.CenterStart)
+                                .offset(x = (progress*1f*360).dp - 2.dp)
+                                .background(Color.White, shape= RoundedCornerShape(2.dp))
+                        )
+                    }
+                }
+            }
+            item {
+                Surface(
+                    shape = RoundedCornerShape(6.dp),
+                    color = if (isGreenLight) Color(0xFF0D3B2E) else Color(0xFF3B0D1A)
+                ) {
+                    Text(
+                        text = if (isGreenLight) "🟢 Green Light" else "🔴 Red Light",
+                        color = if (isGreenLight) Teal else Red,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                    )
+                }
+            }
             item{
                 var savingsGoalInput by remember{mutableStateOf(viewModel.getSavingsGoal().let{if(it>0) it.toString() else ""})}
                 var isEditingGoal by remember{mutableStateOf(false)}
@@ -226,55 +282,6 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                             )
                         }
                     }
-                }
-            }
-            item {
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text("◀ Red Light", color = Red, fontSize = 10.sp)
-                        Text("Green Light ▶", color = Teal, fontSize = 10.sp)
-                    }
-                    Box(
-                        modifier = Modifier.fillMaxWidth().height(10.dp)
-                    ){
-                        Row(modifier=Modifier.fillMaxSize()){
-                            Box(
-                                modifier = Modifier.weight(1f).fillMaxHeight().background(
-                                        brush = Brush.horizontalGradient(colors = listOf(Red, DarkCard))
-                                )
-                            )
-                            Box(
-                                modifier = Modifier.weight(1f).fillMaxHeight().background(
-                                    brush = Brush.horizontalGradient(colors = listOf(DarkCard, Teal))
-                                )
-                            )
-                        }
-                        Box(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .width(4.dp)
-                                .align(Alignment.CenterStart)
-                                .offset(x = (progress*1f*360).dp - 2.dp)
-                                .background(Color.White, shape= RoundedCornerShape(2.dp))
-                        )
-                    }
-                }
-            }
-            item {
-                Surface(
-                    shape = RoundedCornerShape(6.dp),
-                    color = if (isGreenLight) Color(0xFF0D3B2E) else Color(0xFF3B0D1A)
-                ) {
-                    Text(
-                        text = if (isGreenLight) "🟢 Green Light" else "🔴 Red Light",
-                        color = if (isGreenLight) Teal else Red,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-                    )
                 }
             }
             item{
