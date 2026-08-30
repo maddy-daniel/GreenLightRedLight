@@ -95,6 +95,110 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                     }
                 }
             }
+
+            item{
+                var savingsGoalInput by remember{mutableStateOf(viewModel.getSavingsGoal().let{if(it>0) it.toString() else ""})}
+                var isEditingGoal by remember{mutableStateOf(false)}
+                var savingsGoal by remember{mutableStateOf(viewModel.getSavingsGoal())}
+                val availableAfterGoal = net - savingsGoal
+
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = DarkCard),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        Text(
+                            text = "Weekly savings goal",
+                            color = MutedText,
+                            fontSize = 11.sp
+                        )
+                        IconButton(
+                            onClick = {isEditingGoal = !isEditingGoal},
+                            modifier = Modifier.size(24.dp)
+                        )
+                        {
+                            Text(if(isEditingGoal)"✓" else "✏️", fontSize = 12.sp)
+                        }
+                    }
+
+                    if(isEditingGoal){
+                        OutlinedTextField(
+                            value = savingsGoalInput,
+                            onValueChange = {input->
+                                savingsGoalInput = input.filter{it.isDigit() || it == '.'}
+                            },
+                            placeholder = {
+                                Text(
+                                    text = "0.00",
+                                    color = MutedText
+                                )
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Teal,
+                                unfocusedBorderColor = MutedText,
+                                focusedTextColor = Color.White,
+                                unfocusedTextColor= Color.White,
+                                focusedContainerColor = NavyBackground,
+                                unfocusedContainerColor = NavyBackground,
+                                cursorColor = Teal
+                            ),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        Button(
+                            onClick = {
+                                val goal = savingsGoalInput.toDoubleOrNull()?: 0.0
+                                viewModel.setSavingsGoal(goal)
+                                savingsGoal = goal
+                                isEditingGoal = false
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = Teal),
+                            shape = RoundedCornerShape(8.dp)
+                        ){
+                            Text(
+                                text = "Save Goal",
+                                color = NavyBackground,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
+                    else{
+                        Text(
+                            text = "$%.2f".format(savingsGoal),
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                        if(savingsGoal>0){
+                            HorizontalDivider(color = Color(0xFF2A2A4A))
+                            Text(
+                                text = "Available after goal",
+                                color = MutedText,
+                                fontSize = 11.sp
+                            )
+                            Text(
+                                text = "$%.2f".format(availableAfterGoal),
+                                color = if(availableAfterGoal>=0) Teal else Red,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
+
+                    Column(
+                        modifier = Modifier.padding(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                    ){
+
+                    }
+                }
+            }
             item{
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)){
                     Card(
