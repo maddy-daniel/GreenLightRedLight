@@ -37,8 +37,15 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
 
     val progress = when{
         totalIncome == 0.0 && totalExpense == 0.0 -> 0.5f
-        totalIncome == 0.0 ->0f
-        else->(totalIncome/(totalIncome+totalExpense)).toFloat().coerceIn(0f,1f)
+        totalIncome == 0.0 ->0f                             //No Income at all with expenses present = most extreme
+        else->
+        {
+            //Net as a percentage of income, capped at +100%/-100%. A deficit equal to your whole income
+            //(expenses = 2x the income) lands at the extreme red end. A surplus equal to your income lands at the
+            //extreme green end.
+            val severityRatio = (net/totalIncome).coerceIn(-1.0, 1.0)
+            (0.5+severityRatio/2).toFloat()
+        }
 
     }
 
@@ -112,15 +119,31 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                         Text("◀ Red Light", color = Red, fontSize = 10.sp)
                         Text("Green Light ▶", color = Teal, fontSize = 10.sp)
                     }
-                    Box(
+                    val severityLabel = when{
+                        totalIncome == 0.0 && totalExpense == 0.0 ->"No Entries Yet"
+                        net>= 0 -> "On Track"
+                        totalIncome == 0.0 ->"Critical - No Income entered"
+                        (net/totalIncome)<=-0.5 -> "Critical - Spending far exceeds income"
+                        else->"Over Budget"
+                    }
+                    Text(
+                        text = severityLabel,
+                        color = if(net>=0) Teal else Red,
+                        fontSize = 10.sp,
+                        modifier=Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+                    BoxWithConstraints(
                         modifier = Modifier.fillMaxWidth().height(10.dp)
                     ){
-                        Row(modifier=Modifier.fillMaxSize()){
+                        val barWidth = maxWidth
+                        Row(modifier = Modifier.fillMaxWidth()) {
                             Box(
-                                modifier = Modifier.weight(1f).fillMaxHeight().background(
-                                    brush = Brush.horizontalGradient(colors = listOf(Red, DarkCard))
+                            modifier = Modifier.weight(1f).fillMaxHeight().background(
+                                brush = Brush.horizontalGradient(colors = listOf(Red, DarkCard))
                                 )
                             )
+
                             Box(
                                 modifier = Modifier.weight(1f).fillMaxHeight().background(
                                     brush = Brush.horizontalGradient(colors = listOf(DarkCard, Teal))
@@ -132,7 +155,7 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                                 .fillMaxHeight()
                                 .width(4.dp)
                                 .align(Alignment.CenterStart)
-                                .offset(x = (progress*1f*360).dp - 2.dp)
+                                .offset(x = (barWidth * progress) - 2.dp)
                                 .background(Color.White, shape= RoundedCornerShape(2.dp))
                         )
                     }
