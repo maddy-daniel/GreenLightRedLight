@@ -19,6 +19,11 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.IconButton
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.background
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 
 private const val TAG = "AddEntryDebug"
 
@@ -59,6 +64,9 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
     var hourlyRateError by remember { mutableStateOf<String?>(null) }
     var hoursWorkedError by remember { mutableStateOf<String?>(null) }
 
+    val focusManager = LocalFocusManager.current
+    val amountFocusRequester = remember{FocusRequester()}
+    val hoursWorkedFocusRequester = remember{FocusRequester()}
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -228,6 +236,14 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
                         nameError = null },
                     placeholder = {Text("e.g. Paycheck", color = MutedText)},
                     modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    keyboardActions = KeyboardActions(
+                        onNext = {
+                            if (isHourly && isIncome) amountFocusRequester.requestFocus()
+                            else amountFocusRequester.requestFocus()
+                        }
+                    ),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = if (isIncome) Teal else Red,
                         unfocusedBorderColor = MutedText,
@@ -258,8 +274,10 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
                             Log.d(TAG, "amount input changed: raw='$input', filtered ='$filtered'")
                         },
                         placeholder = {Text("0.00", color = MutedText)},
-                        modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        modifier = Modifier.fillMaxWidth().focusRequester(amountFocusRequester),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(onDone = {focusManager.clearFocus()}),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = if (isIncome) Teal else Red,
                             unfocusedBorderColor = MutedText,
@@ -297,8 +315,10 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
                             Log.d(TAG, "Calculated amount = $amount")
                         },
                         placeholder = {Text("0.00", color = MutedText)},
-                        modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        modifier = Modifier.fillMaxWidth().focusRequester(amountFocusRequester),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Next),
+                        keyboardActions = KeyboardActions(onNext = {hoursWorkedFocusRequester.requestFocus()}),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Teal,
                             unfocusedBorderColor = MutedText,
@@ -333,8 +353,10 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
                             Log.d(TAG, "Calculated amount = $amount")
                         },
                         placeholder = {Text("0.00", color = MutedText)},
-                        modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        modifier = Modifier.fillMaxWidth().focusRequester(hoursWorkedFocusRequester),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(onDone = {focusManager.clearFocus()}),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Teal,
                             unfocusedBorderColor = MutedText,
