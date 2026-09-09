@@ -12,6 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.compose.ui.Alignment
 
 @Composable
 fun DeleteEntryScreen(navController: NavController, viewModel: BudgetViewModel) {
@@ -29,7 +30,23 @@ fun DeleteEntryScreen(navController: NavController, viewModel: BudgetViewModel) 
             modifier = Modifier.fillMaxSize().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ){
-            Text("Delete Entry", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Medium)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Text("Delete Entry", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Medium)
+                IconButton(
+                    onClick = {
+                        navController.navigate(NavRoutes.HELP)
+                    }
+                ){
+                    Text(
+                        text = "❓",
+                        fontSize = 18.sp
+                    )
+                }
+            }
 
             Text("Type", color = MutedText, fontSize = 11.sp)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)){

@@ -1,5 +1,6 @@
 package com.mads.greenlightredlight
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,6 +26,7 @@ val Teal = Color(0xFF4ECCA3)
 val Red = Color(0xFFE94560)
 val MutedText = Color(0xFF8888AA)
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
     val entries by viewModel.entries.collectAsState()
@@ -82,12 +84,22 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                             textAlign = TextAlign.Center
                         )
                     }
-                    IconButton(onClick = {navController.navigate(NavRoutes.SETTINGS)},
-                        modifier = Modifier.align(Alignment.CenterEnd)){
-                        Text(
-                            text = "⚙️",
-                            fontSize = 18.sp
-                        )
+                    Row(
+                        modifier = Modifier.align(Alignment.CenterEnd),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ){
+                        IconButton(onClick = {navController.navigate(NavRoutes.HELP)}) {
+                            Text(
+                                text = "❓",
+                                fontSize = 18.sp
+                            )
+                        }
+                        IconButton(onClick = {navController.navigate(NavRoutes.SETTINGS)}){
+                            Text(
+                                text = "⚙️",
+                                fontSize = 18.sp
+                            )
+                        }
                     }
                 }
             }
@@ -135,7 +147,8 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                     )
                     BoxWithConstraints(
                         modifier = Modifier.fillMaxWidth().height(10.dp)
-                    ){
+                    )
+                    {
                         val barWidth = maxWidth
                         Row(modifier = Modifier.fillMaxWidth()) {
                             Box(

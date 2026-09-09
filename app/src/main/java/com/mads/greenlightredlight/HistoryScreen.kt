@@ -53,19 +53,39 @@ fun HistoryScreen(navController: NavController, viewModel: BudgetViewModel) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         )
         {
-            item{
-                Text(
-                    text = "History",
-                    color = Color.White,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "Past weekly budgets",
-                    color = MutedText,
-                    fontSize = 12.sp
-                )
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Column{
+                        Text(
+                            text = "History",
+                            color = Color.White,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "Past weekly budgets",
+                            color = MutedText,
+                            fontSize = 12.sp
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            navController.navigate(NavRoutes.HELP)
+                        }
+                    ) {
+                        Text(
+                            text = "❓",
+                            fontSize = 18.sp
+                        )
+                    }
+
+                }
             }
+
             item{
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     filters.forEach{

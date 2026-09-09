@@ -58,10 +58,26 @@ fun CalendarScreen(navController: NavController, viewModel: BudgetViewModel) {
             item{
                 Row(
                     modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ){
+                    IconButton(
+                        onClick = {
+                            navController.navigate(NavRoutes.HELP)
+                        }
+                    ) {
+                        Text(
+                            text = "❓",
+                            fontSize = 18.sp
+                        )
+                    }
+                }
+            }
+            item{
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
-                )
-                {
+                ) {
                     Text(
                         text = "◀",
                         color = Teal,

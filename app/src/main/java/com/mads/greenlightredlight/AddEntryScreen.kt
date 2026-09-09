@@ -79,12 +79,28 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
                 modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 16.dp, end = 16.dp,top=16.dp, bottom = 32.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ){
-                Text(
-                    if(isEditing)"Edit Entry" else "Add Entry",
-                        color = if (isIncome) Teal else Red,
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Text(
+                        if(isEditing)"Edit Entry" else "Add Entry",
+                        color = if (isIncome)Teal else Red,
                         fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium
-                 )
+                        fontWeight= FontWeight.Medium
+                    )
+                    IconButton(
+                        onClick = {
+                            navController.navigate(NavRoutes.HELP)
+                        }
+                    ){
+                        Text(
+                            text = "❓",
+                            fontSize = 18.sp
+                        )
+                    }
+                }
 
                 Text("Type", color = MutedText, fontSize= 11.sp)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
