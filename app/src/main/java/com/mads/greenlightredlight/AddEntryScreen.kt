@@ -56,7 +56,13 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
     var name by remember {mutableStateOf(existingEntry?.name ?: "")}
     var amount by remember { mutableStateOf(existingEntry?.amount?.toString() ?: "") }
     var frequency by remember{mutableStateOf(existingEntry?.frequency ?: "Weekly")}
-    var isMonthlyExpense by remember {mutableStateOf(existingEntry?.let{!it.isIncome && it.frequency == "Monthly"}?:false)}
+    var expenseFrequency by remember{
+        mutableStateOf(
+            existingEntry?.let{
+                if(!it.isIncome) it.frequency else "Weekly"
+            }?: "Weekly"
+        )
+    }
     var hourlyRate by remember { mutableStateOf("") }
     var hoursWorked by remember { mutableStateOf("") }
     var nameError by remember { mutableStateOf<String?>(null) }
@@ -226,22 +232,56 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
                     }
                 }
                 if(!isIncome){
+                    Text("Expense Frequency", color = MutedText, fontSize = 11.sp)
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ){
-                        Text("Monthly Expense?", color = MutedText, fontSize = 11.sp)
-                        Switch(
-                            checked = isMonthlyExpense,
-                            onCheckedChange = {isMonthlyExpense = it},
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = Color.White,
-                                checkedTrackColor = Red,
-                                uncheckedThumbColor = Color.White,
-                                uncheckedTrackColor = DarkCard
+                        Button(
+                            onClick = {expenseFrequency = "Weekly"},
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(containerColor = DarkCard),
+                            border = if(expenseFrequency == "Weekly") ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
+                                brush = androidx.compose.ui.graphics.SolidColor(Red)
                             )
+                            else null,
+                            shape = RoundedCornerShape(8.dp)
+                        ){
+                            Text(
+                                text = "Weekly",
+                                color = if(expenseFrequency == "Weekly") Red else MutedText
+                            )
+                        }
+                        Button(
+                            onClick = {expenseFrequency = "Monthly"},
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(containerColor = DarkCard),
+                            border = if(expenseFrequency == "Monthly") ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
+                                brush = androidx.compose.ui.graphics.SolidColor(Red)
+                            )
+                            else null,
+                            shape = RoundedCornerShape(8.dp)
+                        ){
+                            Text(
+                                text = "Monthly",
+                                color = if(expenseFrequency == "Monthly") Red else MutedText
+                            )
+                        }
+                        Button(
+                            onClick = {expenseFrequency = "Yearly"},
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(containerColor = DarkCard),
+                            border = if(expenseFrequency == "Yearly") ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
+                                brush = androidx.compose.ui.graphics.SolidColor(Red)
+                            )
+                            else null,
+                            shape = RoundedCornerShape(8.dp)
                         )
+                        {
+                            Text(
+                                text = "Yearly",
+                                color = if(expenseFrequency == "Yearly") Red else MutedText
+                            )
+                        }
                     }
                 }
                 Text("Name", color = MutedText, fontSize = 11.sp)
@@ -427,7 +467,11 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
 
                         if (!hasError) {
                             val weeklyAmount = when {
-                                !isIncome && isMonthlyExpense -> parsedAmount / 4.2
+                                !isIncome -> when (expenseFrequency){
+                                    "Monthly" -> parsedAmount/4.2
+                                    "Yearly" -> parsedAmount /52.0
+                                    else -> parsedAmount
+                                }
                                 isIncome -> when (frequency) {
                                     "Weekly" -> parsedAmount
                                     "Bi-weekly" -> parsedAmount / 2.0
@@ -448,7 +492,7 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
                                     isIncome = isIncome,
                                     isRecurring = isRecurring,
                                     isHourly = isHourly,
-                                    frequency = if(isIncome) frequency else if (isMonthlyExpense)"Monthly" else "Weekly",
+                                    frequency = if(isIncome) frequency else expenseFrequency,
                                     dateAdded = existingEntry?.dateAdded?:java.time.LocalDate.now().toString()
                                 )
                             if(isEditing){
