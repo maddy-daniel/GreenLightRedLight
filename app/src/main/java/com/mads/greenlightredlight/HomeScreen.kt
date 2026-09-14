@@ -88,13 +88,13 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                         modifier = Modifier.align(Alignment.CenterEnd),
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ){
-                        IconButton(onClick = {navController.navigate(NavRoutes.HELP)}) {
+                        IconButton(onClick = rememberHapticClick{navController.navigate(NavRoutes.HELP)}) {
                             Text(
                                 text = "❓",
                                 fontSize = 18.sp
                             )
                         }
-                        IconButton(onClick = {navController.navigate(NavRoutes.SETTINGS)}){
+                        IconButton(onClick = rememberHapticClick{navController.navigate(NavRoutes.SETTINGS)}){
                             Text(
                                 text = "⚙️",
                                 fontSize = 18.sp
@@ -210,7 +210,7 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                             fontSize = 11.sp
                         )
                         IconButton(
-                            onClick = {isEditingGoal = !isEditingGoal},
+                            onClick = rememberHapticClick{isEditingGoal = !isEditingGoal},
                             modifier = Modifier.size(24.dp)
                         )
                         {
@@ -243,7 +243,7 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                             shape = RoundedCornerShape(8.dp)
                         )
                         Button(
-                            onClick = {
+                            onClick = rememberHapticClick{
                                 val goal = savingsGoalInput.toDoubleOrNull()?: 0.0
                                 viewModel.setSavingsGoal(goal)
                                 savingsGoal = goal
@@ -323,7 +323,7 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
             item{
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)){
                     Button(
-                        onClick = {selectedTab = 0},
+                        onClick = rememberHapticClick {selectedTab = 0},
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (selectedTab == 0) Teal else DarkCard
@@ -336,7 +336,7 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                         )
                     }
                     Button(
-                        onClick = {selectedTab = 1},
+                        onClick = rememberHapticClick {selectedTab = 1},
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (selectedTab == 1) Red else DarkCard
@@ -390,7 +390,7 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                                         modifier = Modifier.weight(1f)
                                     )
                                     IconButton(
-                                        onClick={navController.navigate("add_entry?entryId=${entry.id}")},
+                                        onClick= rememberHapticClick{navController.navigate("add_entry?entryId=${entry.id}")},
                                         modifier = Modifier.size(28.dp)
                                     ){
                                         Text(
@@ -481,7 +481,7 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                                     modifier = Modifier.weight(1f)
                                 )
                                 IconButton(
-                                    onClick = { navController.navigate("add_entry?entryId=${entry.id}") },
+                                    onClick = rememberHapticClick{ navController.navigate("add_entry?entryId=${entry.id}") },
                                     modifier = Modifier.size(28.dp)
                                 )
                                 {

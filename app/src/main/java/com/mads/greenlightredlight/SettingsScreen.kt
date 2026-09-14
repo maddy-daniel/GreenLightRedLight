@@ -14,6 +14,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 
 @Composable
 fun SettingsScreen(navController: NavController){
@@ -60,9 +62,11 @@ fun SettingsScreen(navController: NavController){
                             fontSize = 11.sp
                         )
                     }
+                    val haptic = LocalHapticFeedback.current
                     Switch(
                         checked = isLockEnabled,
                         onCheckedChange = { enabled->
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             isLockEnabled = enabled
                             SecurePrefs.setLockEnabled(context, enabled)
                         },
@@ -77,7 +81,7 @@ fun SettingsScreen(navController: NavController){
             }
 
             OutlinedButton(
-                onClick = {navController.popBackStack()},
+                onClick = rememberHapticClick{navController.popBackStack()},
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = MutedText),
                 shape = RoundedCornerShape(12.dp)

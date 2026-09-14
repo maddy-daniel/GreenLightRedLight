@@ -61,7 +61,7 @@ fun CalendarScreen(navController: NavController, viewModel: BudgetViewModel) {
                     horizontalArrangement = Arrangement.End
                 ){
                     IconButton(
-                        onClick = {
+                        onClick = rememberHapticClick{
                             navController.navigate(NavRoutes.HELP)
                         }
                     ) {
@@ -82,7 +82,7 @@ fun CalendarScreen(navController: NavController, viewModel: BudgetViewModel) {
                         text = "◀",
                         color = Teal,
                         fontSize = 18.sp,
-                        modifier = Modifier.clickable { currentMonth = currentMonth.minusMonths(1) }
+                        modifier = Modifier.clickable(onClick = rememberHapticClick{ currentMonth = currentMonth.minusMonths(1) })
                     )
                     Text(
                         currentMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy")),
@@ -94,7 +94,7 @@ fun CalendarScreen(navController: NavController, viewModel: BudgetViewModel) {
                         text = "▶",
                         color = Teal,
                         fontSize = 18.sp,
-                        modifier = Modifier.clickable { currentMonth = currentMonth.plusMonths(1) }
+                        modifier = Modifier.clickable(onClick = rememberHapticClick { currentMonth = currentMonth.plusMonths(1) })
                     )
                 }
             }
@@ -141,10 +141,10 @@ fun CalendarScreen(navController: NavController, viewModel: BudgetViewModel) {
                         text = weekNumber,
                         color = Teal,
                         fontSize = 10.sp,
-                        modifier = Modifier.width(28.dp).clickable {
+                        modifier = Modifier.width(28.dp).clickable(onClick = rememberHapticClick {
                             selectedWeekStart = weekStart
                             selectedDate = null
-                        },
+                        }),
                         textAlign = TextAlign.Center
                     )
 
@@ -156,10 +156,10 @@ fun CalendarScreen(navController: NavController, viewModel: BudgetViewModel) {
                         val hasEntries = datesWithEntries.contains(date.toString())
 
                         Column(
-                            modifier = Modifier.weight(1f).clickable {
+                            modifier = Modifier.weight(1f).clickable(onClick = rememberHapticClick {
                                 selectedDate = date
                                 selectedWeekStart = null
-                            },
+                            }),
                             horizontalAlignment = Alignment.CenterHorizontally
                         )
                         {

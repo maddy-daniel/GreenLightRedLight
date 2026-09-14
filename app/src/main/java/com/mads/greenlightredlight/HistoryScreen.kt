@@ -73,7 +73,7 @@ fun HistoryScreen(navController: NavController, viewModel: BudgetViewModel) {
                         )
                     }
                     IconButton(
-                        onClick = {
+                        onClick = rememberHapticClick{
                             navController.navigate(NavRoutes.HELP)
                         }
                     ) {
@@ -91,7 +91,7 @@ fun HistoryScreen(navController: NavController, viewModel: BudgetViewModel) {
                     filters.forEach{
                         filter->
                         OutlinedButton(
-                            onClick = {
+                            onClick = rememberHapticClick{
                                 selectedFilter = filter
                             },
                             shape = RoundedCornerShape(8.dp),
@@ -138,7 +138,7 @@ fun HistoryScreen(navController: NavController, viewModel: BudgetViewModel) {
                     val weekEndDate = LocalDate.parse(week.weekEnd)
 
                     Card(
-                        onClick = {
+                        onClick = rememberHapticClick {
                             expanded = !expanded
                         },
                         colors = CardDefaults.cardColors(containerColor = DarkCard),
