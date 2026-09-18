@@ -233,12 +233,12 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
                 }
                 if(!isIncome){
                     Text("Expense Frequency", color = MutedText, fontSize = 11.sp)
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ){
                         Button(
                             onClick = rememberHapticClick{expenseFrequency = "Weekly"},
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(containerColor = DarkCard),
                             border = if(expenseFrequency == "Weekly") ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
                                 brush = androidx.compose.ui.graphics.SolidColor(Red)
@@ -253,7 +253,7 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
                         }
                         Button(
                             onClick = rememberHapticClick{expenseFrequency = "Monthly"},
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(containerColor = DarkCard),
                             border = if(expenseFrequency == "Monthly") ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
                                 brush = androidx.compose.ui.graphics.SolidColor(Red)
@@ -268,7 +268,7 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
                         }
                         Button(
                             onClick = rememberHapticClick{expenseFrequency = "Yearly"},
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(containerColor = DarkCard),
                             border = if(expenseFrequency == "Yearly") ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
                                 brush = androidx.compose.ui.graphics.SolidColor(Red)

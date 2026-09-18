@@ -6,12 +6,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -94,42 +97,56 @@ fun WelcomeScreen(navController: NavController) {
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Button(
-                    onClick = {
-                        navController.navigate(NavRoutes.HOME) {
-                            popUpTo(NavRoutes.WELCOME) {
-                                inclusive = true
+                val cappedDensity = LocalDensity.current
+                val clampedFontScale = cappedDensity.fontScale.coerceAtMost(1.3f)
+                CompositionLocalProvider(
+                    LocalDensity provides Density(
+                        density = cappedDensity.density,
+                        fontScale = clampedFontScale
+                    )
+                ){
+                    Button(
+                        onClick = {
+                            navController.navigate(NavRoutes.HOME) {
+                                popUpTo(NavRoutes.WELCOME) {
+                                    inclusive = true
+                                }
                             }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = Teal),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = "▶ Start",
+                            color = NavyBackground,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(vertical = 4.dp)
+                        )
+                    }
+                    OutlinedButton(
+                        onClick = {
+                            navController.navigate(NavRoutes.HELP)
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MutedText),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+
+                            Text(
+                                text = "❓ Help",
+                                fontSize = 16.sp,
+                                textAlign = TextAlign.Center
+                            )
                         }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Teal),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text(
-                        text = "▶ Start",
-                        color = NavyBackground,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(vertical = 4.dp)
-                    )
+                    }
                 }
-
-                OutlinedButton(
-                    onClick = {
-                        navController.navigate(NavRoutes.HELP)
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MutedText),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text(
-                        text = "❓ Help",
-                        fontSize = 16.sp,
-                        modifier = Modifier.padding(vertical = 4.dp)
-                    )
-                }
-
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }

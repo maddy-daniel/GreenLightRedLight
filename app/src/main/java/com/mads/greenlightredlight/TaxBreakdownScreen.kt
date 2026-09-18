@@ -153,7 +153,7 @@ fun TaxBreakdownScreen(navController: NavController, viewModel: BudgetViewModel,
                 }
 
                 Button(
-                    onClick = {
+                    onClick = rememberHapticClick{
                         CsvExporter.exportSingleEntry(context, entry)
                     },
                     modifier = Modifier.fillMaxWidth(),
@@ -168,7 +168,7 @@ fun TaxBreakdownScreen(navController: NavController, viewModel: BudgetViewModel,
                 }
             }
             OutlinedButton(
-                onClick = {navController.popBackStack() },
+                onClick = rememberHapticClick{navController.popBackStack() },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = MutedText),
                 shape = RoundedCornerShape(12.dp)

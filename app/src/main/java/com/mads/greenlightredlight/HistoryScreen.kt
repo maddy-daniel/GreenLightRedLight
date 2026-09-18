@@ -14,6 +14,9 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Density
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -87,26 +90,42 @@ fun HistoryScreen(navController: NavController, viewModel: BudgetViewModel) {
             }
 
             item{
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    filters.forEach{
-                        filter->
-                        OutlinedButton(
-                            onClick = rememberHapticClick{
-                                selectedFilter = filter
-                            },
-                            shape = RoundedCornerShape(8.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = if(selectedFilter==filter) Teal else MutedText
-                            ),
-                            border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
-                                brush = androidx.compose.ui.graphics.SolidColor(
-                                    if(selectedFilter == filter) Teal else Color(0xFF2A2A4A)
+                val cappedDensity = LocalDensity.current
+                val clampedFontScale = cappedDensity.fontScale.coerceAtMost(1.3f)
+                CompositionLocalProvider(
+                    LocalDensity provides Density(
+                        density = cappedDensity.density,
+                        fontScale = clampedFontScale
+                    )
+                ) {
+
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        filters.forEach { filter ->
+                            OutlinedButton(
+                                onClick = rememberHapticClick {
+                                    selectedFilter = filter
+                                },
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = if (selectedFilter == filter) Teal else MutedText
+                                ),
+                                border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
+                                    brush = androidx.compose.ui.graphics.SolidColor(
+                                        if (selectedFilter == filter) Teal else Color(0xFF2A2A4A)
+                                    )
+                                ),
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 14.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = filter,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center,
+                                    maxLines = 1
                                 )
-                            ),
-                            contentPadding = PaddingValues(horizontal = 12.dp, vertical= 6.dp),
-                            modifier = Modifier.height(36.dp)
-                        ){
-                            Text(filter, fontSize = 11.sp)
+                            }
                         }
                     }
                 }
@@ -168,70 +187,63 @@ fun HistoryScreen(navController: NavController, viewModel: BudgetViewModel) {
                                     fontSize = 11.sp
                                 )
                             }
-                            Row(
+                            Column(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
                             )
                             {
-                                Card(
-                                    modifier = Modifier.weight(1f),
-                                    colors = CardDefaults.cardColors(containerColor = DarkCard),
-                                    shape = RoundedCornerShape(8.dp)
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
                                 )
                                 {
-                                    Column(modifier = Modifier.padding(8.dp)) {
-                                        Text(
-                                            text = "Income",
-                                            color = MutedText,
-                                            fontSize = 10.sp
-                                        )
-                                        Text(
-                                            text = "$${String.format("%.2f", week.totalIncome)}",
-                                            color = Teal,
-                                            fontSize = 13.sp,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                    }
+                                    Text(
+                                        text = "Income",
+                                        color = MutedText,
+                                        fontSize = 11.sp
+                                    )
+                                    Text(
+                                        text = "$${String.format("%.2f", week.totalIncome)}",
+                                        color = Teal,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Medium
+                                    )
+
                                 }
-                                Card(
-                                    modifier = Modifier.weight(1f),
-                                    colors = CardDefaults.cardColors(containerColor = NavyBackground),
-                                    shape = RoundedCornerShape(8.dp)
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
                                 )
                                 {
-                                    Column(modifier = Modifier.padding(8.dp)) {
-                                        Text(
-                                            text = "Expenses",
-                                            color = MutedText,
-                                            fontSize = 10.sp
-                                        )
-                                        Text(
-                                            text = "$${String.format("%.2f", week.totalExpenses)}",
-                                            color = Red,
-                                            fontSize = 13.sp,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                    }
+                                    Text(
+                                        text = "Expenses",
+                                        color = MutedText,
+                                        fontSize = 11.sp
+                                    )
+                                    Text(
+                                        text = "$${String.format("%.2f", week.totalExpenses)}",
+                                        color = Red,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Medium
+                                    )
+
                                 }
-                                Card(
-                                    modifier = Modifier.weight(1f),
-                                    colors = CardDefaults.cardColors(containerColor = NavyBackground),
-                                    shape = RoundedCornerShape(8.dp)
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
                                 )
                                 {
-                                    Column(modifier = Modifier.padding(8.dp)) {
-                                        Text(
-                                            text = "Net",
-                                            color = MutedText,
-                                            fontSize = 10.sp
-                                        )
-                                        Text(
-                                            text = "$${String.format("%.2f", week.netBalance)}",
-                                            color = if(isGreen) Teal else Red,
-                                            fontSize = 13.sp,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                    }
+                                    Text(
+                                        text = "Net",
+                                        color = MutedText,
+                                        fontSize = 11.sp
+                                    )
+                                    Text(
+                                        text = "$${String.format("%.2f", week.netBalance)}",
+                                        color = if(isGreen) Teal else Red,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Medium
+                                    )
                                 }
                             }
                             Surface(
