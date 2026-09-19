@@ -33,6 +33,8 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
     val incomeEntries = entries.filter{it.isIncome}
     val expenseEntries = entries.filter{!it.isIncome}
     var selectedTab by remember{mutableStateOf(0)}
+    var entryPendingDelete by remember{mutableStateOf<Entry?>(null)}
+
     val net = viewModel.netBalance()
     val totalIncome = viewModel.totalIncome()
     val totalExpense = viewModel.totalExpenses()
@@ -371,79 +373,78 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                     }
                 } else {
                     items(incomeEntries) { entry ->
-                        Card(
-                            colors = CardDefaults.cardColors(containerColor = DarkCard),
-                            shape = RoundedCornerShape(6.dp)
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(10.dp),
-                                verticalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.Top
+                        SwipeableEntryCard(
+                            onEdit = { navController.navigate("add_entry?entryId=${entry.id}")},
+                            onDuplicate = {viewModel.duplicateEntry(entry)},
+                            onDeleteRequest = {entryPendingDelete = entry}
+                        )
+                        {
+                            Card(
+                                colors = CardDefaults.cardColors(containerColor = DarkCard),
+                                shape = RoundedCornerShape(6.dp)
+                            )
+                            {
+                                Column(
+                                    modifier = Modifier.padding(10.dp),
+                                    verticalArrangement = Arrangement.spacedBy(4.dp)
                                 ) {
-                                    Text(
-                                        "${entry.name} — ${if (entry.isRecurring) "Recurring" else "Incidental"} — ${entry.frequency}",
-                                        color = Color.White,
-                                        fontSize = 11.sp,
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                    IconButton(
-                                        onClick = rememberHapticClick { navController.navigate("add_entry?entryId=${entry.id}") },
-                                    ) {
-                                        Text(
-                                            text = "✏️",
-                                            fontSize = 11.sp,
-                                            modifier = Modifier.padding(top = 3.dp)
-                                        )
-                                    }
-                                }
-
-                                if (entry.isHourly) {
-                                    val netTakeHome = TaxCalculator.calculateNetTakeHome(entry.weeklyAmount)
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.Top
                                     ) {
                                         Text(
-                                            text = "After Tax",
-                                            color = MutedText,
-                                            fontSize = 9.sp
+                                            "${entry.name} — ${if (entry.isRecurring) "Recurring" else "Incidental"} — ${entry.frequency}",
+                                            color = Color.White,
+                                            fontSize = 11.sp,
+                                            modifier = Modifier.weight(1f)
                                         )
+                                    }
+
+                                    if (entry.isHourly) {
+                                        val netTakeHome = TaxCalculator.calculateNetTakeHome(entry.weeklyAmount)
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            Text(
+                                                text = "After Tax",
+                                                color = MutedText,
+                                                fontSize = 9.sp
+                                            )
+                                            Text(
+                                                text = "$${String.format("%.2f", netTakeHome)}/wk",
+                                                color = Teal,
+                                                fontSize = 11.sp,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                        }
+                                        OutlinedButton(
+                                            onClick = rememberHapticClick {
+                                                navController.navigate("tax_breakdown/${entry.id}")
+                                            },
+                                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                                            modifier = Modifier.fillMaxWidth(),
+                                            colors = ButtonDefaults.outlinedButtonColors(contentColor = Teal),
+                                            border = ButtonDefaults.outlinedButtonBorder(enabled = true)
+                                                .copy(width = 1.dp)
+                                        )
+                                        {
+                                            Text(
+                                                text = "📄 View tax breakdown",
+                                                fontSize = 9.sp
+                                            )
+                                        }
+                                    } else {
                                         Text(
-                                            text = "$${String.format("%.2f", netTakeHome)}/wk",
+                                            text = "$%.2f/wk".format(entry.weeklyAmount),
                                             color = Teal,
                                             fontSize = 11.sp,
-                                            fontWeight = FontWeight.Medium
+                                            fontWeight = FontWeight.Medium,
+                                            modifier = Modifier.fillMaxWidth(),
+                                            textAlign = TextAlign.End
                                         )
                                     }
-                                    OutlinedButton(
-                                        onClick = rememberHapticClick {
-                                            navController.navigate("tax_breakdown/${entry.id}")
-                                        },
-                                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                                        modifier = Modifier.fillMaxWidth(),
-                                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Teal),
-                                        border = ButtonDefaults.outlinedButtonBorder(enabled = true)
-                                            .copy(width = 1.dp)
-                                    )
-                                    {
-                                        Text(
-                                            text = "📄 View tax breakdown",
-                                            fontSize = 9.sp
-                                        )
-                                    }
-                                } else {
-                                    Text(
-                                        text = "$%.2f/wk".format(entry.weeklyAmount),
-                                        color = Teal,
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.Medium,
-                                        modifier = Modifier.fillMaxWidth(),
-                                        textAlign = TextAlign.End
-                                    )
                                 }
                             }
                         }
@@ -471,39 +472,37 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                     }
                 } else {
                     items(expenseEntries) { entry ->
-                        Card(
-                            colors = CardDefaults.cardColors(containerColor = DarkCard),
-                            shape = RoundedCornerShape(6.dp)
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(10.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
+                        SwipeableEntryCard(
+                            onEdit = {navController.navigate("expense_entry?entryId=${entry.id}")},
+                            onDuplicate = {viewModel.duplicateEntry(entry)},
+                            onDeleteRequest = {entryPendingDelete = entry}
+                        )
+                        {
+                            Card(
+                                colors = CardDefaults.cardColors(containerColor = DarkCard),
+                                shape = RoundedCornerShape(6.dp)
                             ) {
-                                Text(
-                                    "${entry.name} — ${if (entry.isRecurring) "Recurring" else "Incidental"} — ${entry.frequency}",
-                                    color = Color.White,
-                                    fontSize = 11.sp,
-                                    modifier = Modifier.weight(1f)
-                                )
-                                IconButton(
-                                    onClick = rememberHapticClick{ navController.navigate("add_entry?entryId=${entry.id}") },
-                                )
-                                {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(10.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
                                     Text(
-                                        text = "✏️",
+                                        "${entry.name} — ${if (entry.isRecurring) "Recurring" else "Incidental"} — ${entry.frequency}",
+                                        color = Color.White,
                                         fontSize = 11.sp,
-                                        modifier = Modifier.padding(top = 3.dp)
+                                        modifier = Modifier.weight(1f)
                                     )
+                                    Text(
+                                        "$%.2f/wk".format(entry.weeklyAmount),
+                                        color = Red,
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Medium
+                                    )
+
                                 }
-                                Text(
-                                    "$%.2f/wk".format(entry.weeklyAmount),
-                                    color = Red,
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Medium
-                                )
                             }
                         }
                     }
@@ -544,6 +543,51 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                     }
                 }
             }
+        }
+        entryPendingDelete?.let{
+            entry->
+            AlertDialog(
+                onDismissRequest = {entryPendingDelete=null },
+                title = {
+                    Text(
+                        text = "Delete Entry",
+                        fontWeight = FontWeight.Medium
+                    )
+                },
+                text = {
+                    Text(
+                        text = "Are you sure you want to delete this entry?"
+                    )
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = rememberHapticClick {
+                            viewModel.deleteEntry(entry.id)
+                            entryPendingDelete = null
+                        }
+                    ) {
+                        Text(
+                            text = "Confirm",
+                            color = Red
+                        )
+                    }
+
+                },
+                    dismissButton = {
+                        TextButton(
+                            onClick = rememberHapticClick{entryPendingDelete=null}
+                        )
+                        {
+                            Text(
+                                text = "Cancel",
+                                color = MutedText
+                            )
+                        }
+                    },
+                containerColor = DarkCard,
+                titleContentColor = Color.White,
+                textContentColor = MutedText
+            )
         }
     }
 }
