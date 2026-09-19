@@ -37,7 +37,7 @@ fun DeleteEntryScreen(navController: NavController, viewModel: BudgetViewModel) 
             ){
                 Text("Delete Entry", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Medium)
                 IconButton(
-                    onClick = {
+                    onClick = rememberHapticClick{
                         navController.navigate(NavRoutes.HELP)
                     }
                 ){
@@ -51,7 +51,7 @@ fun DeleteEntryScreen(navController: NavController, viewModel: BudgetViewModel) 
             Text("Type", color = MutedText, fontSize = 11.sp)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)){
                 Button(
-                    onClick = {
+                    onClick = rememberHapticClick{
                         isIncome = true
                         selectedEntryId = null
                     },
@@ -64,7 +64,7 @@ fun DeleteEntryScreen(navController: NavController, viewModel: BudgetViewModel) 
                     Text("Income",color = if(!isIncome) Color.White else MutedText)
                 }
                 Button(
-                    onClick = {
+                    onClick = rememberHapticClick{
                         isIncome = false
                         selectedEntryId = null
                     },
@@ -101,7 +101,7 @@ fun DeleteEntryScreen(navController: NavController, viewModel: BudgetViewModel) 
                 else{
                     items(filteredEntries) { entry ->
                         Card(
-                            onClick = { selectedEntryId = entry.id },
+                            onClick = rememberHapticClick{ selectedEntryId = entry.id },
                             colors = CardDefaults.cardColors(
                                 containerColor = if (selectedEntryId == entry.id)
                                     if (isIncome) Color(0xFF0D3B2E) else Color(0xFF3B0D1A)
@@ -139,7 +139,7 @@ fun DeleteEntryScreen(navController: NavController, viewModel: BudgetViewModel) 
                 }
             }
             Button(
-                onClick = {
+                onClick = rememberHapticClick{
                     selectedEntryId?.let{
                         viewModel.deleteEntry(it)
                         navController.popBackStack()
@@ -155,7 +155,7 @@ fun DeleteEntryScreen(navController: NavController, viewModel: BudgetViewModel) 
             }
 
             OutlinedButton(
-                onClick = {navController.popBackStack()},
+                onClick = rememberHapticClick{navController.popBackStack()},
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = MutedText),
                 shape = RoundedCornerShape(8.dp)

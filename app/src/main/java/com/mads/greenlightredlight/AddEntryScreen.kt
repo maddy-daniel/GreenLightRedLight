@@ -97,7 +97,7 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
                         fontWeight= FontWeight.Medium
                     )
                     IconButton(
-                        onClick = {
+                        onClick = rememberHapticClick{
                             navController.navigate(NavRoutes.HELP)
                         }
                     ){
@@ -111,7 +111,7 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
                 Text("Type", color = MutedText, fontSize= 11.sp)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(
-                        onClick = {isIncome = true},
+                        onClick = rememberHapticClick {isIncome = true},
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if(isIncome) Teal else DarkCard
@@ -121,7 +121,7 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
                         Text("Income", color = if(isIncome) NavyBackground else MutedText)
                     }
                     Button(
-                        onClick = {isIncome = false},
+                        onClick = rememberHapticClick {isIncome = false},
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if(!isIncome) Red else DarkCard
@@ -134,7 +134,7 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
                 Text("Category", color=MutedText, fontSize = 11.sp)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(
-                        onClick = {isRecurring = true},
+                        onClick = rememberHapticClick {isRecurring = true},
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(containerColor = DarkCard),
                         border = if (isRecurring) ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
@@ -145,7 +145,7 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
                         Text("Recurring", color = if(isRecurring)(if(isIncome)Teal else Red) else MutedText)
                     }
                     Button(
-                        onClick = {isRecurring = false},
+                        onClick = rememberHapticClick {isRecurring = false},
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(containerColor = DarkCard),
                         border = if (!isRecurring) ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
@@ -167,7 +167,7 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
                             onValueChange={},
                             readOnly = true,
                             trailingIcon = {
-                                IconButton(onClick = {frequencyExpanded = !frequencyExpanded}){
+                                IconButton(onClick = rememberHapticClick {frequencyExpanded = !frequencyExpanded}){
                                     Text("▼", color = MutedText, fontSize = 12.sp)
                                 }
                             },
@@ -208,7 +208,7 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
                     Text("Income type", color = MutedText, fontSize=11.sp)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Button(
-                            onClick = {isHourly = false},
+                            onClick = rememberHapticClick {isHourly = false},
                             modifier = Modifier.weight(1f),
                             colors = ButtonDefaults.buttonColors(containerColor = DarkCard),
                             border = if(!isHourly) ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
@@ -219,7 +219,7 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
                             Text("Flat", color = if (!isHourly) Teal else MutedText)
                         }
                         Button(
-                            onClick = {isHourly = true},
+                            onClick = rememberHapticClick{isHourly = true},
                             modifier = Modifier.weight(1f),
                             colors = ButtonDefaults.buttonColors(containerColor = DarkCard),
                             border = if (isHourly) ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
@@ -233,12 +233,12 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
                 }
                 if(!isIncome){
                     Text("Expense Frequency", color = MutedText, fontSize = 11.sp)
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ){
                         Button(
-                            onClick = {expenseFrequency = "Weekly"},
-                            modifier = Modifier.weight(1f),
+                            onClick = rememberHapticClick{expenseFrequency = "Weekly"},
+                            modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(containerColor = DarkCard),
                             border = if(expenseFrequency == "Weekly") ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
                                 brush = androidx.compose.ui.graphics.SolidColor(Red)
@@ -252,8 +252,8 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
                             )
                         }
                         Button(
-                            onClick = {expenseFrequency = "Monthly"},
-                            modifier = Modifier.weight(1f),
+                            onClick = rememberHapticClick{expenseFrequency = "Monthly"},
+                            modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(containerColor = DarkCard),
                             border = if(expenseFrequency == "Monthly") ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
                                 brush = androidx.compose.ui.graphics.SolidColor(Red)
@@ -267,8 +267,8 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
                             )
                         }
                         Button(
-                            onClick = {expenseFrequency = "Yearly"},
-                            modifier = Modifier.weight(1f),
+                            onClick = rememberHapticClick{expenseFrequency = "Yearly"},
+                            modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(containerColor = DarkCard),
                             border = if(expenseFrequency == "Yearly") ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
                                 brush = androidx.compose.ui.graphics.SolidColor(Red)
@@ -454,7 +454,7 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
                     }
                 }
                 Button(
-                    onClick = {
+                    onClick = rememberHapticClick{
                         val parsedAmount = amount.toDoubleOrNull() ?: 0.0
                         Log.d(TAG, "Save tapped: name = '$name', amount = '$amount', parsedAmount = $parsedAmount',isHourly = $isHourly, hourlyRate = '$hourlyRate', hoursWorked='$hoursWorked'")
 
@@ -517,7 +517,7 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
                     Text(if(isEditing) "Update Entry" else "Save Entry", color = NavyBackground, fontWeight = FontWeight.Medium)
                 }
                 OutlinedButton(
-                    onClick = {navController.popBackStack() },
+                    onClick = rememberHapticClick{navController.popBackStack() },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(contentColor = MutedText),
                     shape = RoundedCornerShape(8.dp)

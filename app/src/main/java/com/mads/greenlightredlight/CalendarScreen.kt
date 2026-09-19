@@ -61,7 +61,7 @@ fun CalendarScreen(navController: NavController, viewModel: BudgetViewModel) {
                     horizontalArrangement = Arrangement.End
                 ){
                     IconButton(
-                        onClick = {
+                        onClick = rememberHapticClick{
                             navController.navigate(NavRoutes.HELP)
                         }
                     ) {
@@ -82,7 +82,7 @@ fun CalendarScreen(navController: NavController, viewModel: BudgetViewModel) {
                         text = "◀",
                         color = Teal,
                         fontSize = 18.sp,
-                        modifier = Modifier.clickable { currentMonth = currentMonth.minusMonths(1) }
+                        modifier = Modifier.clickable(onClick = rememberHapticClick{ currentMonth = currentMonth.minusMonths(1) })
                     )
                     Text(
                         currentMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy")),
@@ -94,7 +94,7 @@ fun CalendarScreen(navController: NavController, viewModel: BudgetViewModel) {
                         text = "▶",
                         color = Teal,
                         fontSize = 18.sp,
-                        modifier = Modifier.clickable { currentMonth = currentMonth.plusMonths(1) }
+                        modifier = Modifier.clickable(onClick = rememberHapticClick { currentMonth = currentMonth.plusMonths(1) })
                     )
                 }
             }
@@ -129,72 +129,81 @@ fun CalendarScreen(navController: NavController, viewModel: BudgetViewModel) {
 
             items(weeks){
                 week->
-                val weekStart = week.first()
-                val weekEnd = week.last()
-                val weekNumber = weekStart.format(DateTimeFormatter.ofPattern("w"))
+                val cappedDensity = androidx.compose.ui.platform.LocalDensity.current
+                val clampedFontScale = cappedDensity.fontScale.coerceAtMost(1.3f)
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-                    Text(
-                        text = weekNumber,
-                        color = Teal,
-                        fontSize = 10.sp,
-                        modifier = Modifier.width(28.dp).clickable {
-                            selectedWeekStart = weekStart
-                            selectedDate = null
-                        },
-                        textAlign = TextAlign.Center
+                androidx.compose.runtime.CompositionLocalProvider(
+                    androidx.compose.ui.platform.LocalDensity provides androidx.compose.ui.unit.Density(
+                        density = cappedDensity.density,
+                        fontScale = clampedFontScale
                     )
+                )
+                {
+                    val weekStart = week.first()
+                    val weekEnd = week.last()
+                    val weekNumber = weekStart.format(DateTimeFormatter.ofPattern("w"))
 
-                    week.forEach{
-                        date->
-                        val isToday = date == today
-                        val isSelected = date == selectedDate
-                        val isCurrentMonth = date.month == currentMonth.month
-                        val hasEntries = datesWithEntries.contains(date.toString())
-
-                        Column(
-                            modifier = Modifier.weight(1f).clickable {
-                                selectedDate = date
-                                selectedWeekStart = null
-                            },
-                            horizontalAlignment = Alignment.CenterHorizontally
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = weekNumber,
+                            color = Teal,
+                            fontSize = 10.sp,
+                            modifier = Modifier.width(28.dp).clickable(onClick = rememberHapticClick {
+                                selectedWeekStart = weekStart
+                                selectedDate = null
+                            }),
+                            textAlign = TextAlign.Center
                         )
-                        {
-                            Box(
-                                modifier = Modifier.size(30.dp).clip(CircleShape).background(
-                                    when{
-                                        isToday -> Teal
-                                        isSelected -> Color(0xFF2A2A4A)
-                                        else -> Color.Transparent
-                                    }
-                                ).then(
-                                if(isSelected && !isToday)
-                                    Modifier.border(1.dp, MutedText, CircleShape)
-                                else Modifier
-                            ),
-                            contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    date.dayOfMonth.toString(),
-                                    color = when {
-                                        isToday -> NavyBackground
-                                        isCurrentMonth -> Color.White
-                                        else -> Color(0xFF444466)
-                                    },
-                                    fontSize = 12.sp,
-                                    fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal
-                                )
-                            }
-                            if(hasEntries){
+
+                        week.forEach { date ->
+                            val isToday = date == today
+                            val isSelected = date == selectedDate
+                            val isCurrentMonth = date.month == currentMonth.month
+                            val hasEntries = datesWithEntries.contains(date.toString())
+
+                            Column(
+                                modifier = Modifier.weight(1f).clickable(onClick = rememberHapticClick {
+                                    selectedDate = date
+                                    selectedWeekStart = null
+                                }),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            )
+                            {
                                 Box(
-                                    modifier = Modifier.size(5.dp).clip(CircleShape).background(Teal)
-                                )
-                            }
-                            else{
-                                Spacer(modifier = Modifier.height(5.dp))
+                                    modifier = Modifier.size(30.dp).clip(CircleShape).background(
+                                        when {
+                                            isToday -> Teal
+                                            isSelected -> Color(0xFF2A2A4A)
+                                            else -> Color.Transparent
+                                        }
+                                    ).then(
+                                        if (isSelected && !isToday)
+                                            Modifier.border(1.dp, MutedText, CircleShape)
+                                        else Modifier
+                                    ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        date.dayOfMonth.toString(),
+                                        color = when {
+                                            isToday -> NavyBackground
+                                            isCurrentMonth -> Color.White
+                                            else -> Color(0xFF444466)
+                                        },
+                                        fontSize = 12.sp,
+                                        fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal
+                                    )
+                                }
+                                if (hasEntries) {
+                                    Box(
+                                        modifier = Modifier.size(5.dp).clip(CircleShape).background(Teal)
+                                    )
+                                } else {
+                                    Spacer(modifier = Modifier.height(5.dp))
+                                }
                             }
                         }
                     }

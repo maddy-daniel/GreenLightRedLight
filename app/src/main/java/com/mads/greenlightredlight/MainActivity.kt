@@ -197,7 +197,7 @@ class MainActivity : FragmentActivity() {
                             )
                             Spacer(modifier = Modifier.height(24.dp))
                             Button(
-                                onClick = {authTrigger++},
+                                onClick = rememberHapticClick{authTrigger++},
                                 colors = ButtonDefaults.buttonColors(containerColor = Teal),
                                 shape = RoundedCornerShape(12.dp)
                             )
@@ -223,20 +223,20 @@ class MainActivity : FragmentActivity() {
                                     if (currentRoute in bottomNavRoutes) {
                                         BottomNavBar(
                                             currentRoute = currentRoute,
-                                            onHomeClick = {
+                                            onHomeClick = rememberHapticClick {
                                                 navController.navigate(NavRoutes.HOME) {
                                                     popUpTo(NavRoutes.HOME) {
                                                         inclusive = true
                                                     }
                                                 }
                                             },
-                                            onHistoryClick = {
+                                            onHistoryClick = rememberHapticClick {
                                                 navController.navigate(NavRoutes.HISTORY) {
                                                     popUpTo(NavRoutes.HOME)
                                                 }
 
                                             },
-                                            onCalendarClick = {
+                                            onCalendarClick = rememberHapticClick{
                                                 navController.navigate(NavRoutes.CALENDAR) {
                                                     popUpTo(NavRoutes.HOME)
                                                 }

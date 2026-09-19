@@ -63,44 +63,43 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ){
             item {
-                Box(modifier = Modifier.fillMaxWidth())
+                Column(modifier = Modifier.fillMaxWidth())
                 {
-                    Column(
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalArrangement = Arrangement.End
                     )
                     {
+                        IconButton(onClick = rememberHapticClick { navController.navigate(NavRoutes.HELP) }) {
+                            Text(
+                                text = "❓",
+                                fontSize = 18.sp
+                            )
+                        }
+                        IconButton(onClick = rememberHapticClick { navController.navigate(NavRoutes.SETTINGS) }) {
+                            Text(
+                                text = "⚙️",
+                                fontSize = 18.sp
+                            )
+                        }
+
+                    }
                         Text(
                             text = "Green Light Red Light",
                             color = Color.White,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Medium,
                             textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+
                         )
                         Text(
                             text = "NJ Tax Calculator * Weekly Budget",
                             color = MutedText,
                             fontSize = 11.sp,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
                         )
-                    }
-                    Row(
-                        modifier = Modifier.align(Alignment.CenterEnd),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ){
-                        IconButton(onClick = {navController.navigate(NavRoutes.HELP)}) {
-                            Text(
-                                text = "❓",
-                                fontSize = 18.sp
-                            )
-                        }
-                        IconButton(onClick = {navController.navigate(NavRoutes.SETTINGS)}){
-                            Text(
-                                text = "⚙️",
-                                fontSize = 18.sp
-                            )
-                        }
-                    }
                 }
             }
             item{
@@ -210,11 +209,10 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                             fontSize = 11.sp
                         )
                         IconButton(
-                            onClick = {isEditingGoal = !isEditingGoal},
-                            modifier = Modifier.size(24.dp)
+                            onClick = rememberHapticClick{isEditingGoal = !isEditingGoal},
                         )
                         {
-                            Text(if(isEditingGoal)"✓" else "✏️", fontSize = 12.sp)
+                            Text(if(isEditingGoal)"✓" else "✏️", fontSize = 11.sp, modifier = Modifier.padding(top = 3.dp))
                         }
                     }
 
@@ -243,7 +241,7 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                             shape = RoundedCornerShape(8.dp)
                         )
                         Button(
-                            onClick = {
+                            onClick = rememberHapticClick{
                                 val goal = savingsGoalInput.toDoubleOrNull()?: 0.0
                                 viewModel.setSavingsGoal(goal)
                                 savingsGoal = goal
@@ -323,7 +321,7 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
             item{
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)){
                     Button(
-                        onClick = {selectedTab = 0},
+                        onClick = rememberHapticClick {selectedTab = 0},
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (selectedTab == 0) Teal else DarkCard
@@ -336,7 +334,7 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                         )
                     }
                     Button(
-                        onClick = {selectedTab = 1},
+                        onClick = rememberHapticClick {selectedTab = 1},
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (selectedTab == 1) Red else DarkCard
@@ -377,11 +375,14 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                             colors = CardDefaults.cardColors(containerColor = DarkCard),
                             shape = RoundedCornerShape(6.dp)
                         ) {
-                            Column(modifier = Modifier.padding(10.dp)) {
+                            Column(
+                                modifier = Modifier.padding(10.dp),
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
+                                    verticalAlignment = Alignment.Top
                                 ) {
                                     Text(
                                         "${entry.name} — ${if (entry.isRecurring) "Recurring" else "Incidental"} — ${entry.frequency}",
@@ -390,52 +391,59 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                                         modifier = Modifier.weight(1f)
                                     )
                                     IconButton(
-                                        onClick={navController.navigate("add_entry?entryId=${entry.id}")},
-                                        modifier = Modifier.size(28.dp)
-                                    ){
+                                        onClick = rememberHapticClick { navController.navigate("add_entry?entryId=${entry.id}") },
+                                    ) {
                                         Text(
                                             text = "✏️",
-                                            fontSize = 12.sp
+                                            fontSize = 11.sp,
+                                            modifier = Modifier.padding(top = 3.dp)
                                         )
                                     }
+                                }
 
-                                    if (entry.isHourly) {
-                                        val netTakeHome = TaxCalculator.calculateNetTakeHome(entry.weeklyAmount)
-                                        Column(horizontalAlignment = Alignment.End) {
-                                            Text(
-                                                text = "After Tax",
-                                                color = MutedText,
-                                                fontSize = 9.sp
-                                            )
-                                            Text(
-                                                text = "$${String.format("%.2f", netTakeHome)}/wk",
-                                                color = Teal,
-                                                fontSize = 11.sp,
-                                                fontWeight = FontWeight.Medium
-                                            )
-                                        }
-                                    } else {
+                                if (entry.isHourly) {
+                                    val netTakeHome = TaxCalculator.calculateNetTakeHome(entry.weeklyAmount)
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
                                         Text(
-                                            text = "$%.2f/wk".format(entry.weeklyAmount),
+                                            text = "After Tax",
+                                            color = MutedText,
+                                            fontSize = 9.sp
+                                        )
+                                        Text(
+                                            text = "$${String.format("%.2f", netTakeHome)}/wk",
                                             color = Teal,
                                             fontSize = 11.sp,
                                             fontWeight = FontWeight.Medium
                                         )
                                     }
-                                }
-                                if (entry.isHourly) {
-                                    Spacer(modifier = Modifier.height(4.dp))
                                     OutlinedButton(
-                                        onClick = {
+                                        onClick = rememberHapticClick {
                                             navController.navigate("tax_breakdown/${entry.id}")
                                         },
-                                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
-                                        modifier = Modifier.height(28.dp),
+                                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                                        modifier = Modifier.fillMaxWidth(),
                                         colors = ButtonDefaults.outlinedButtonColors(contentColor = Teal),
-                                        border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(width = 1.dp)
-                                    ) {
-                                        Text("📄 View tax breakdown", fontSize = 9.sp)
+                                        border = ButtonDefaults.outlinedButtonBorder(enabled = true)
+                                            .copy(width = 1.dp)
+                                    )
+                                    {
+                                        Text(
+                                            text = "📄 View tax breakdown",
+                                            fontSize = 9.sp
+                                        )
                                     }
+                                } else {
+                                    Text(
+                                        text = "$%.2f/wk".format(entry.weeklyAmount),
+                                        color = Teal,
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        modifier = Modifier.fillMaxWidth(),
+                                        textAlign = TextAlign.End
+                                    )
                                 }
                             }
                         }
@@ -481,13 +489,13 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                                     modifier = Modifier.weight(1f)
                                 )
                                 IconButton(
-                                    onClick = { navController.navigate("add_entry?entryId=${entry.id}") },
-                                    modifier = Modifier.size(28.dp)
+                                    onClick = rememberHapticClick{ navController.navigate("add_entry?entryId=${entry.id}") },
                                 )
                                 {
                                     Text(
                                         text = "✏️",
-                                        fontSize = 12.sp
+                                        fontSize = 11.sp,
+                                        modifier = Modifier.padding(top = 3.dp)
                                     )
                                 }
                                 Text(

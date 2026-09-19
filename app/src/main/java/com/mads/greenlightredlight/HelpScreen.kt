@@ -51,8 +51,8 @@ fun HelpScreen(navController: NavController) {
             HorizontalDivider(color = Color(0xFF2A2A4A))
 
             HelpSection(title = "Category"){
-                HelpStep(label = "Recurring", description = "An entry that happens every week like a paycheck or rent. Kept after New Week Rollover.")
-                HelpStep(label = "Incidental", description = "A one-time or irregular entry like a bonus or unexpected expense. Cleared after New Week Rollover.")
+                HelpStep(label = "Recurring", description = "An entry that happens every week like a paycheck or rent. Kept when the week automatically rolls over.")
+                HelpStep(label = "Incidental", description = "A one-time or irregular entry like a bonus or unexpected expense. Automatically cleared after a new week begins.")
             }
 
             HorizontalDivider(color = Color(0xFF2A2a4a))
@@ -63,7 +63,7 @@ fun HelpScreen(navController: NavController) {
             }
             HorizontalDivider(color = Color(0xFF2A2A4A))
 
-            HelpSection(title = "Pay frequencies"){
+            HelpSection(title = "Frequencies"){
                 Text(
                     text = "All pay frequencies are automatically converted to a weekly amount so your balance is always calculated on a weekly basis.",
                     color = Color(0xFFCCCCDD),
@@ -75,8 +75,8 @@ fun HelpScreen(navController: NavController) {
                 HelpStep(label = "Weekly", description = "52 paychecks/year - no conversion needed.")
                 HelpStep(label = "Bi-weekly", description = "26 paychecks/year - amount divided by 2.")
                 HelpStep(label = "Semi-monthly", description = "24 paychecks/year - amount multiplied by 24 then divided by 52.")
-                HelpStep(label = "Monthly", description = "12 paychecks/year - amount multiplied by 12 then divided by 52.")
-                HelpStep(label = "Yearly expense", description = "Annual expense divided by 52 to get weekly amount.")
+                HelpStep(label = "Monthly", description = "12 paychecks/year (income) or a monthly expense - amount multiplied by 12 then divided by 52.")
+                HelpStep(label = "Yearly expense", description = "Annual expense (e.g. insurance, subscription)- amount divided by 52 to get weekly amount.")
             }
             HorizontalDivider(color = Color(0xFF2A2A4A))
 
@@ -102,7 +102,7 @@ fun HelpScreen(navController: NavController) {
                 HelpStep(label = "3.", description = "Select Income or Expense and fill in the details.")
                 HelpStep(label = "4.", description = "View your weekly balance on the home screen.")
                 HelpStep(label = "5.", description = "Tap an income entry to view its federal tax breakdown.")
-                HelpStep(label = "6.", description = "Tap New Week Rollover at the start of each week to reset.")
+                HelpStep(label = "6.", description = "Your weekly budget automatically resets at the start of each new week - recurring entries carry over, incidental entries are clear.")
             }
 
             OutlinedButton(
