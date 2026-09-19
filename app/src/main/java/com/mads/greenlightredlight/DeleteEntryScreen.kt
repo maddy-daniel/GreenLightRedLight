@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 fun DeleteEntryScreen(navController: NavController, viewModel: BudgetViewModel) {
     var isIncome by remember { mutableStateOf(true) }
     var selectedEntryId by remember { mutableStateOf<Int?>(null) }
+    var entryPendingDelete by remember {mutableStateOf<Entry?>(null)}
 
     val entries by viewModel.entries.collectAsState()
     val filteredEntries = entries.filter{it.isIncome == isIncome}
@@ -140,10 +141,7 @@ fun DeleteEntryScreen(navController: NavController, viewModel: BudgetViewModel) 
             }
             Button(
                 onClick = rememberHapticClick{
-                    selectedEntryId?.let{
-                        viewModel.deleteEntry(it)
-                        navController.popBackStack()
-                    }
+                    entryPendingDelete = selectedEntryId?.let{id->entries.find {it.id == id}}
                 },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = selectedEntryId != null,
@@ -162,6 +160,38 @@ fun DeleteEntryScreen(navController: NavController, viewModel: BudgetViewModel) 
             ){
                 Text("Cancel")
             }
+        }
+        entryPendingDelete?.let {
+            entry->
+            AlertDialog(
+                onDismissRequest = { entryPendingDelete = null },
+                title = {Text(
+                    text = "Delete entry",
+                    fontWeight = FontWeight.Medium
+                )},
+                text = {Text("Are you sure you want to delete this entry?")},
+                confirmButton = {
+                    TextButton(
+                        onClick = rememberHapticClick{
+                            viewModel.deleteEntry(entry.id)
+                            navController.popBackStack()
+                            entryPendingDelete = null
+                        }
+                    ){
+                        Text("Confirm", color = Red)
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = rememberHapticClick { entryPendingDelete = null }
+                    ){
+                        Text("Cancel",color = MutedText)
+                    }
+                },
+                containerColor = DarkCard,
+                titleContentColor = Color.White,
+                textContentColor = MutedText
+            )
         }
     }
 }

@@ -24,6 +24,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 
 private const val TAG = "AddEntryDebug"
 
@@ -73,6 +75,7 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
     val focusManager = LocalFocusManager.current
     val amountFocusRequester = remember{FocusRequester()}
     val hoursWorkedFocusRequester = remember{FocusRequester()}
+    val context = LocalContext.current
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -498,10 +501,12 @@ fun AddEntryScreen(navController: NavController, viewModel: BudgetViewModel, ent
                             if(isEditing){
                                 viewModel.updateEntry(entryToSave)
                                 Log.d(TAG, "Entry updated successfully")
+                                Toast.makeText(context, "Entry Updated!", Toast.LENGTH_SHORT).show()
                             }
                             else{
                                 viewModel.addEntry(entryToSave)
                                 Log.d(TAG, "Entry submitted to ViewModel successfully")
+                                Toast.makeText(context, "Entry saved!", Toast.LENGTH_SHORT).show()
                             }
 
                             navController.popBackStack()

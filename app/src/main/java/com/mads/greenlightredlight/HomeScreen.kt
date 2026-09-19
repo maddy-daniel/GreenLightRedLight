@@ -362,7 +362,7 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                             shape = RoundedCornerShape(6.dp)
                         ) {
                             Text(
-                                "No entries yet",
+                                "Add your first income entry to get started!",
                                 color = MutedText,
                                 fontSize = 11.sp,
                                 modifier = Modifier.padding(10.dp)
@@ -462,7 +462,7 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                             shape = RoundedCornerShape(6.dp)
                         ) {
                             Text(
-                                "No entries yet",
+                                "Add your first expense entry to get started!",
                                 color = MutedText,
                                 fontSize = 11.sp,
                                 modifier = Modifier.padding(10.dp)
