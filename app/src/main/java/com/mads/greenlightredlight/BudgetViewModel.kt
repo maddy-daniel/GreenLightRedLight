@@ -54,6 +54,12 @@ class BudgetViewModel(private val entryDao: EntryDao, private val context: Conte
         }
     }
 
+    fun duplicateEntry(entry: Entry){
+        viewModelScope.launch {
+            entryDao.insertEntry(entry.copy(id = 0))
+        }
+    }
+
     fun setSavingsGoal(amount: Double){
         prefs.edit().putFloat("savings_goal", amount.toFloat()).apply()
     }
