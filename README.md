@@ -97,6 +97,7 @@ All dependencies are managed in app/build.gradle.kts:
 //Core
 implementation("androidx.core:core-ktx:1.10.1")
 implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.1")
 implementation("androidx.activity:activity-compose:1.8.0")
 
 //Jetpack Compose
@@ -117,6 +118,10 @@ implementation("androidx.room:room-runtime:2.6.1")
 implementation("androidx.room:room-ktx:2.6.1")
 kapt("androidx.room:room-compiler:2.6.1")
 
+//Security & Biometrics
+implementation("androidx.biometric:biometric:1.1.0")
+implementation("androidx.security:security-crypto:1.1.0-alpha06")
+
 Build Configuration:
 android{
     namespace = "com.mads.greenlightredlight"
@@ -126,8 +131,8 @@ android{
         applicationId = "com.mads.greenlightredlight"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 3
+        versionName = "3"
     }
 
     compileOptions{
@@ -148,7 +153,7 @@ android{
 Architecture:
 The app follows the MVVM (Model-View-View-Model) architecture pattern
 - View - Jetpack Compose screens observe StateFlow from the ViewModel and recompose automatically when data changes
-- ViewModel - Holds all business logic, calculates totals, weekly amounts, and net balance. Survives screen rotations
+- ViewModel - Holds all business logic, calculates totals, weekly amounts, net balance, savings goal, duplication, rollover checks. Survives screen rotations
 - DAO (Data Access Object) - Defines all database operations as suspend functions running on background threads
 - Database - Room SQLite database stored locally on the device
 
@@ -177,6 +182,7 @@ Fields:
 - isHourly - True if income is hourly, false if flat
 - Frequency - Pay frequency string (Weekly, Bi-Weekly, etc.)
 - dateAdded - Date the entry was created in yyyy-MM-dd format
+Duplicating an entry copies all fields except id, which is reset to 0 so Room generates a new distinct ID.
 
 Navigation: 
 Navigation is handled by the Jetpack Navigation Component. All routes are defined in NavRoutes.kt:
@@ -185,12 +191,15 @@ Route-
 - welcome - Welcome Screen
 - home - Home Screen
 - help - Help Screen
-- add_entry - Add Entry Screen
+- add_entry?entryId={entryId} - Add Entry Screen
 - delete_entry - Delete Entry Screen
 - tax_breakdown/{entryId} - Tax Breakdown Screen
 - all_tax_breakdown - All Tax Breakdowns Screen
 - calendar - Calendar Screen
 - history - History Screen
+- settings - Settings Screen (App Lock toggle)
+The Welcome screen re-displays every time the app is opened (not just on first launch) - the app covers the 
+screen on background/resume to avoid flashing the previous screen during the transition.
 
 Pay Frequency Conversions: 
 All income entries are converted to a weekly amount using the following formulas:
@@ -218,6 +227,18 @@ Weekly Income:
 - Up to $3,691.35 (Less than or equal to $191,950/year) - Rate of 24%
 - Above $3,691.35 - Rate of 32%
 
+NJ State:
+- NJ State Income Tax - based on 2026 weekly brackets
+- State Disability Insurance (SDI) - 0.19%
+- State Unemployment Insurance (SUI) - 0.43%
+- Family Leave Insurance (FLI) - 0.09%
+
+Security:
+When enabled in Settings, App Lock requires the user to authenticate via biometrics (fingerprint/face) or device PIN/Pattern before
+viewing any app content. Authentication is re-triggered every time the app resumes from the background. If the device has biometric
+or PIN/Pattern configured, the lock is skipped rather than blocking access entirely. The lock preference is stored using EncryptedSharedPreferences,
+separate from the app's other (non-sensitive) stored preferences.
+
 Database:
 The app uses Room Database for local data persistence. 
 The database is initialized as a singleton in AppDatabase.kt and provided to the BudgetViewModel via ViewModelFactory.kt.
@@ -228,6 +249,7 @@ Tables: entries
 
 The EntryDao provides three operations:
 - insertEntry(entry): inserts a new entry
+- updateEntry(entry): updates an existing entry in place
 - deleteEntry(entry): deletes an existing entry
 - getAllEntries(): returns all entries as Flow<List<Entry>> for real-time UI updates
 - deleteIncidentalEntries(): deletes all incidental entries (used by rollover)
@@ -239,16 +261,11 @@ Database Migrations:
 
 Automatic Rollover:
 The app automatically checks on every launch whether a new week (Sunday) has started since the last rollover.
-If yes, all incidental entries are deleted and recurring entries are kept.
-The las rollover date is stored in SharedPreferences under the key last_rollover_date
+If so, all incidental entries are deleted and recurring entries are kept.
+There is no manual rollover button - this happens entirely in the background.
+The last rollover date is stored in SharedPreferences under the key last_rollover_date
 
 Known Issues & Future Work:
-- Weekly history screen - full implementation: Planned
-- Swipe to delete, edit, and duplicate an entry: Planned
-- Delete confirmation dialogue: Planned
-- Empty state messages: Planned
-- Haptic feedback (vibration feedback)
-- Unit Tests: Planned
-- Play Store Released: Planned
-- Some UI elements cut off on smaller screens: In progress
+- Full public Play Store production release: planned (currently gathering closed-testing feedback via tester survey)
+- Continued minor UI polish for edge-case screen sizes - ongoing.
 
