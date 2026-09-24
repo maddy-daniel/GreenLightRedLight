@@ -11,60 +11,86 @@ The app is the Android mobile version of a previously developed JavaFX desktop a
 Package Name: com.mads.greenlightredlight 
 Min SDK: API 24 (Android 7.0 Nougat)
 Target SDK: API 36
-Language: Kotlin UI
-Framework: Jetpack Compose
+Language: Kotlin
+UI Framework: Jetpack Compose
+Current Version: 3.0
+Play Store Status: Closed Testing
 
 Features:
-Current Features:
-- Welcome screen with Start button and Help button displayed on every fresh app launch
-- Help screen explaining the apps features, category types, income types, pay frequencies and federal tax breakdown
-- Add income entries with name, amount, pay frequency, category, and income type
-- Add expense entries with name, amount, pay frequency, category, and monthly toggle
-- Delete income and expense entries
+Core Budgeting
+- Add income entries with name, amount, pay frequency, category, and income type (Flat or Hourly)
+- Add expense entries with name, amount, and frequency (Weekly, Monthly, or Yearly)
+- Edit existing entries in place instead of deleting and re-adding
+- Delete entries with a confirmation dialog to prevent accidental removal
+- Duplicate an entry to quickly create a copy with a new ID
+- Swipe left on any entry (Home screen) to reveal Delete, Edit, and Duplicate actions. Swipe right or tap elsewhere to dismiss
 - Weekly net balance calculated and displayed in real time
-- Custom progress bar, red gradient on the left (Red Light) and teal gradient on the right (Green Light) with a white indicator.
+- Separate Income and Expense tabs on the Home screen 
+- Weekly savings goal tracking, showing "Available after goal" alongside your net balance 
+- Custom progress bar (red gradient on the left / teal gradient on the right) that reflects the actual severity of a deficit or surplus relative to income, with a status label (On Track, Over Budget, Critical)
 - Status badge showing Green Light or Red Light based on net balance
 - All amounts automatically converted to weekly equivalents
-- Hourly income calculation from pay rate * hours worked with live preview
-- Monthly expense conversion to weekly amount (divide by 4.2)
-- Yearly expense conversion to weekly amount (divide by 52)
-- Federal tax breakdown per income entry - federal tax income, social security, and medicare
-- All tax breakdowns screen showing all income entries with deductions and total net take-home
-- CSV download for individual and all tax breakdowns saved to device Downloads folder
-- Local data persistence using Room Database, entries survive app close and reopen
-- Custom app icon with navy to dark blue gradient and teal G  / red R letters
-- Status bar and navigation bar insets handled correctly for all Android devices
+- Hourly income calculation from pay rate x hours worked with a live preview
+- Automatic New Week Rollover every Sunday - clears incidental entries, keeps recurring entries (fully automatic, no manual button)
+- Friendly empty-state messages prompting the user to add their first income or expense entry
+- Success toast messages ("Entry saved!"/"Entry updated!") after saving or editing an entry
+
+Tax Tools
+- Federal tax breakdown per income entry (Flat and Hourly):
+  - Federal income tax
+  - Social Security
+  - Medicare
+- NJ State tax breakdown:
+  - State income tax,
+  - SDI
+  - SUI
+  - FLI
+  - Net take-home
+- All tax breakdowns screen showing every income entry with deductions and total net take-home
+- CSV download for individual and all tax breakdowns, saved to the device's Downloads folder
+
+Navigation & Access
+- Welcome screen with Start and Help buttons shown on every app open (not just first launch)
+- Help screen accessible from every main screen (Home, Add Entry, Delete Entry, Calendar, History) - not just the Welcome screen
+- Bottom navigation bar with Home, History, Calendar tabs
+- Calendar screen - view entries by date, tap a date to see daily, tap a week number to see a weekly summary
+- History screen - filter past weekly budgets by All, Last 4 Weeks, or Last 3 Months, with expandable weekly detail cards
+
+Security & Accessibility
+- Optional app lock using biometric authentication (fingerprint, face, or device PIN/Pattern), toggled in Settings
+- Lock is re-checked every time the app resumes from the background
+- Haptic feedback on all interactive buttons throughout the app
+- Text uses sp units throughout to respect the device's system font size; layouts adjusted so nothing clips or overlaps at larger accessibility font sizes
+
+Platform & Data
+- Local data persistence using Room Database - entries survive app close and reopen
+- Custom app icon with navy-to-dark-blue gradient and teal "G"/ red "R" letters
+- Status bar and navigation bar insets handled correctly across devices
 - Java 8+ date/time API support via core library desugaring for API 24+ compatibility
-- Automatic New Week Rollover every Sunday - Clears incidental entries, keeps recurring entries
-- Bottom navigation bar with Home, History, and Calendar tabs
-- Calendar screen - view entries by date, tap a date to see daily entries, tap a week number to see weekly summary
-- History screen - placeholder, full implementation coming soon
+- Available on Google Play (Closed Testing)
 
-Planned Features:
-- Weekly History screen
-- Swipe to delete, edit, and duplicate entries
-- Delete confirmation log
-- Empty state messages
-- Haptic Feedback
-- Google Play Store release
+Planned Features
+- Continued UI polish on smaller screens
+- Public Play Store production release (currently in Closed Testing, fathering the required tester feedback)
 
-Tech Stack:
-- Language - Kotlin
-- UI Framework - Jetpack Compose
-- Architecture - MVVM (Model-View-View-Model)
-- Navigation - Jetpack Navigation Component
-- Local Storage - Room Database
-- State Management - StateFlow/Kotlin Coroutines
-- Build System - Gradle (KTS)
-- IDE - IntelliJ IDEA
-- Version Control - Git/GitHub
+Tech Stack
+- Language: Kotlin
+- UI Framework: Jetpack Compose
+- Architecture: MVVM (Model-View-View-Model)
+- Navigation: Jetpack Navigation Component
+- Local Storage: Room Database
+- Security: AndroidX Biometric + EncryptedSharedPreferences
+- State Management: StateFlow / Kotlin Coroutines
+- Build System: Gradle (KTS)
+- IDE: IntelliJ IDEA / Android Studio
+- Version Control: Git/GitHub
 
-Configuration:
-Requirements - 
-- IntelliJ IDEA with Android Plugin installed
-- Android SDK API 36 installed
-- JDK 11 or higher
-- Android emulator or physical Android device (API 24+)
+Configuration
+- Requirements
+  - IntelliJ IDEA or Android Studio with Android Plugin installed
+  - Android SDK API 36 installed
+  - JDK 11 or higher
+  - Android emulator or physical Android device (API 24+)
 
 Dependencies: 
 All dependencies are managed in app/build.gradle.kts:
