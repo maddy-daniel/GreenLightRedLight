@@ -134,15 +134,26 @@ class MainActivity : FragmentActivity() {
                                 if (isFirstLaunch) {
                                     isFirstLaunch = false
                                     Log.d(TAG, "ON_START: first launch, startDestination already showing WELCOME")
-                                } else {
+                                }
+                                else if(navController.currentBackStackEntry == null){
+                                    //The navigation graph isn't ready yet, so navigating now would crash.
+                                    //Skip it, and make sure the cover screen isn't left on.
+                                    isTransitioning = false
+                                    Log.d(TAG, "ON_START: nav graph not ready, skipping navigation to WELCOME")
+                                }
+                                else {
                                     isTransitioning = true
                                     Log.d(TAG, "ON_START: app reopened, navigating back to WELCOME")
-
-                                    navController.navigate(NavRoutes.WELCOME) {
-                                        popUpTo(navController.graph.startDestinationId) {
-                                            inclusive = true
+                                    try{
+                                        navController.navigate(NavRoutes.WELCOME) {
+                                            popUpTo(navController.graph.startDestinationId) {
+                                                inclusive = true
+                                            }
+                                            launchSingleTop = true
                                         }
-                                        launchSingleTop = true
+                                    }
+                                    catch(e:IllegalStateException){
+                                        Log.e(TAG,"Navigation wasn't ready on resume, skipping", e)
                                     }
                                     isTransitioning = false
                                     Log.d(TAG, "Cover cleared after navigating to WELCOME")

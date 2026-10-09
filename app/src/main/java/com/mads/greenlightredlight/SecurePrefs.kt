@@ -1,7 +1,7 @@
 package com.mads.greenlightredlight
 
 import android.content.Context
-import android.content.SharedPreferences
+import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 
@@ -24,9 +24,20 @@ object SecurePrefs{
         )
     }
     fun isLockEnabled(context: Context): Boolean{
-        return getPrefs(context).getBoolean(KEY_LOCK_ENABLED, false)
+        return try{
+            getPrefs(context).getBoolean(KEY_LOCK_ENABLED, false)
+        }
+        catch(e: Exception){
+            Log.e("SecurePrefs","Failed to read lock setting, defaulting to disabled", e)
+            false
+        }
     }
     fun setLockEnabled(context: Context, enabled: Boolean){
-        getPrefs(context).edit().putBoolean(KEY_LOCK_ENABLED, enabled).apply()
+        try{
+            getPrefs(context).edit().putBoolean(KEY_LOCK_ENABLED, enabled).apply()
+        }
+        catch(e: Exception){
+            Log.e("SecurePrefs","Failed to save lock setting", e)
+        }
     }
 }

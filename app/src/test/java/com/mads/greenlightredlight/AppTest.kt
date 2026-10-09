@@ -88,6 +88,107 @@ class RolloverTest{
         val result = getMostRecentSunday(sunday)
         assertEquals("Most recent Sunday when today is Sunday should return today's date", sunday, result)
     }
+}
 
+class TaxCalculatorTest{
+    private val delta = 0.001
 
+    @Test
+    fun federalTax_10PercentBracket(){
+        assertEquals(20.0, TaxCalculator.calculateFederalTax(200.0), delta)
+    }
+
+    @Test
+    fun federalTax_12PercentBracket(){
+        assertEquals(55.2, TaxCalculator.calculateFederalTax(460.0), delta)
+    }
+
+    @Test
+    fun federalTax_22PercentBracket(){
+        assertEquals(220.0, TaxCalculator.calculateFederalTax(1000.0), delta)
+    }
+
+    @Test
+    fun federalTax_24PercentBracket(){
+        assertEquals(480.0, TaxCalculator.calculateFederalTax(2000.0), delta)
+    }
+
+    @Test
+    fun federalTax_32PercentBracket(){
+        assertEquals(1600.0, TaxCalculator.calculateFederalTax(5000.0), delta)
+    }
+
+    @Test
+    fun socialSecurity_is6Point2Percent(){
+        assertEquals(28.52, TaxCalculator.calculateSocialSecurity(460.0), delta)
+    }
+
+    @Test
+    fun medicare_is1Point45Percent(){
+        assertEquals(6.67, TaxCalculator.calculateMedicare(460.0), delta)
+    }
+
+    @Test
+    fun njStateTax_secondBracket(){
+        assertEquals(8.05, TaxCalculator.calculateNJStateTax(460.0), delta)
+    }
+
+    @Test
+    fun njInsurances_matchExpectedRates(){
+        assertEquals(0.874, TaxCalculator.calculateSDI(460.0), delta)
+        assertEquals(1.978, TaxCalculator.calculateSUI(460.0), delta)
+        assertEquals(0.414, TaxCalculator.calculateFLI(460.0), delta)
+    }
+
+    @Test
+    fun netTakeHome_for460Gross(){
+        assertEquals(358.294, TaxCalculator.calculateNetTakeHome(460.0), delta)
+    }
+
+    @Test
+    fun netTakeHome_isAlwaysLessThanGross(){
+        listOf(50.0, 1000.0, 2500.0, 5000.0).forEach{
+            gross->
+            assertTrue(TaxCalculator.calculateNetTakeHome(gross)<gross)
+        }
+    }
+
+    @Test
+    fun zeroIncome_producesZeroIncome(){
+        assertEquals(0.0, TaxCalculator.calculateNetTakeHome(0.0), delta)
+    }
+}
+
+class FilterNumericInputTest{
+    private fun filterNumericInput(input: String): String {
+        val digitsAndDot = input.filter{it.isDigit() || it == '.' }
+        val firstDotIndex = digitsAndDot.indexOf('.')
+        if(firstDotIndex == -1) return digitsAndDot
+
+        val before = digitsAndDot.substring(0, firstDotIndex+1)
+        val after = digitsAndDot.substring(firstDotIndex + 1).replace(".","")
+        return before + after
+    }
+
+    @Test
+    fun comma_isRemoved(){
+        assertEquals("1850", filterNumericInput("18,50"))
+    }
+
+    @Test
+    fun spaces_areRemoved(){
+        assertEquals("1600", filterNumericInput("16 00"))
+    }
+
+    @Test
+    fun multipleDecimalPoints_keepsOnlyTheFirst(){
+        assertEquals("18.50", filterNumericInput("18..50"))
+        assertEquals("1.23", filterNumericInput("1.2.3"))
+    }
+
+    @Test
+    fun letters_areRemoved(){
+        assertEquals("", filterNumericInput("abc"))
+        assertEquals("12", filterNumericInput("1a2b"))
+    }
 }

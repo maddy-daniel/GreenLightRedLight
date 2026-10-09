@@ -473,7 +473,7 @@ fun HomeScreen(navController: NavController, viewModel: BudgetViewModel){
                 } else {
                     items(expenseEntries) { entry ->
                         SwipeableEntryCard(
-                            onEdit = {navController.navigate("expense_entry?entryId=${entry.id}")},
+                            onEdit = {navController.navigate("add_entry?entryId=${entry.id}")},
                             onDuplicate = {viewModel.duplicateEntry(entry)},
                             onDeleteRequest = {entryPendingDelete = entry}
                         )
